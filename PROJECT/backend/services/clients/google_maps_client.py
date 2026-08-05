@@ -257,8 +257,7 @@ class GoogleMapsClient:
                     "places.id,places.displayName,places.formattedAddress,"
                     "places.location,places.rating,places.userRatingCount,"
                     "places.priceLevel,places.businessStatus,places.types,"
-                    "places.primaryType,places.photos,places.regularOpeningHours,"
-                    "places.dist"),
+                    "places.primaryType,places.photos,places.regularOpeningHours"),
                 json=body, timeout=self._timeout)
             if resp.status_code in (401, 403):
                 self._google_dead_until = time.time() + _GOOGLE_DEAD_GRACE_S
@@ -420,7 +419,7 @@ class GoogleMapsClient:
             "lng": loc.get("longitude", 0.0),
             "rating": p.get("rating"),
             "user_rating_count": p.get("userRatingCount"),
-            "price_level": p.get("priceLevel"),
+            "price_level": GoogleMapsClient._price_level_int(p.get("priceLevel")),
             "business_status": p.get("businessStatus"),
             "open_now": hours.get("openNow") if isinstance(hours, dict) else None,
             "weekday_hours": hours.get("weekdayDescriptions", []) if isinstance(hours, dict) else [],
@@ -431,6 +430,20 @@ class GoogleMapsClient:
             "website": p.get("websiteUri"),
             "query": query,
         }
+
+    @staticmethod
+    def _price_level_int(price_level) -> int | None:
+        """Places (New) priceLevel enum string -> 0..4 int (schema expects int)."""
+        mapping = {
+            "PRICE_LEVEL_FREE": 0,
+            "PRICE_LEVEL_INEXPENSIVE": 1,
+            "PRICE_LEVEL_MODERATE": 2,
+            "PRICE_LEVEL_EXPENSIVE": 3,
+            "PRICE_LEVEL_VERY_EXPENSIVE": 4,
+        }
+        if isinstance(price_level, int):
+            return price_level
+        return mapping.get(price_level) if isinstance(price_level, str) else None
 
     @staticmethod
     def _category_primary_types(category: str) -> list[str]:

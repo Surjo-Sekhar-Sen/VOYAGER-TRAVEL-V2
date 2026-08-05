@@ -90,12 +90,13 @@ class SerpAPIClient:
             }
         elif data.get("local_results"):
             first = data["local_results"][0]
+            gps = first.get("gps_coordinates") or {}
             out = {
                 "place_id": first.get("place_id"),
                 "title": first.get("title"),
                 "address": first.get("address"),
-                "lat": first.get("latitude"),
-                "lng": first.get("longitude"),
+                "lat": gps.get("latitude") or first.get("latitude"),
+                "lng": gps.get("longitude") or first.get("longitude"),
                 "rating": first.get("rating"),
                 "reviews": first.get("reviews"),
             }
@@ -145,33 +146,56 @@ class SerpAPIClient:
 
     # ----------------------------------------------------------- live prices
     def directions(self, origin: str, dest: str) -> dict | None:
-        """Google Maps directions via SerpAPI -> drive_time + ride options (live).
+        """Google Maps directions via SerpAPI -> drive_time (live).
 
-        Returns {"duration_s": ..., "ride_options": [...]} where ride options are
-        present only when Google Maps exposes real prices. None on failure.
+        Returns {"duration_s": ..., "distance_m": ..., "ride_options": [...]}
+        where ride options are present only when Google Maps exposes real
+        prices. None on failure.
+
+        SerpAPI renamed the start/end params (`start_addr`/`end_addr`, not
+        `q`/`destination`) and the response shape changed to a `directions[]`
+        list (one entry per travel mode) — parse that, keeping the `routes`
+        shape only as a legacy fallback.
         """
         key = f"price:{origin.strip().lower()}:{dest.strip().lower()}"
         cached = self._cached(key, _PRICE_CACHE_S)
         if cached is not None:
             return cached
-        data = self._get({"engine": "google_maps_directions", "q": origin, "destination": dest})
+        data = self._get({
+            "engine": "google_maps_directions",
+            "start_addr": origin,
+            "end_addr": dest,
+        })
         out = None
-        if data and data.get("routes"):
-            route = data["routes"][0]
-            leg = (route.get("legs") or [{}])[0]
-            duration_s = None
-            dur = leg.get("duration") or leg.get("duration_in_traffic")
-            if isinstance(dur, dict):
-                try:
-                    duration_s = int(dur.get("value", 0)) or None
-                except (ValueError, TypeError):
-                    duration_s = None
-            out = {
-                "duration_s": duration_s,
-                "distance_m": (leg.get("distance") or {}).get("value"),
-                "ride_options": data.get("ride_options", []),
-                "source": "live",
-            }
+        if data:
+            if data.get("directions"):
+                # new shape: list of {travel_mode, distance, duration, ...}
+                driving = next(
+                    (d for d in data["directions"] if (d.get("travel_mode") or "").lower() == "driving"),
+                    data["directions"][0],
+                )
+                out = {
+                    "duration_s": driving.get("duration"),
+                    "distance_m": driving.get("distance"),
+                    "ride_options": data.get("ride_options", []),
+                    "source": "live",
+                }
+            elif data.get("routes"):
+                route = data["routes"][0]
+                leg = (route.get("legs") or [{}])[0]
+                duration_s = None
+                dur = leg.get("duration") or leg.get("duration_in_traffic")
+                if isinstance(dur, dict):
+                    try:
+                        duration_s = int(dur.get("value", 0)) or None
+                    except (ValueError, TypeError):
+                        duration_s = None
+                out = {
+                    "duration_s": duration_s,
+                    "distance_m": (leg.get("distance") or {}).get("value"),
+                    "ride_options": data.get("ride_options", []),
+                    "source": "live",
+                }
         self._store(key, out, _PRICE_CACHE_S)
         return out
 

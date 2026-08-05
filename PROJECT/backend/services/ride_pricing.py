@@ -114,7 +114,7 @@ def ride_prices_for_distance(
 
 
 def coord_to_str(coord: tuple[float, float]) -> str:
-    """Format a (lat, lng) pair for SerpAPI's directions q/destination params."""
+    """Format a (lat, lng) pair for SerpAPI's directions start_addr/end_addr params."""
     return f"{coord[0]:.5f},{coord[1]:.5f}"
 
 
