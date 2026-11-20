@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useApp } from "../context/AppContext";
 import type { LatLng, WeatherNow } from "../types";
 import "./HeaderBar.css";
@@ -66,20 +66,6 @@ const AMBIENT: Record<string, string> = {
   clear: "wx-clear", cloudy: "wx-cloudy", fog: "wx-cloudy", rain: "wx-rain",
   drizzle: "wx-drizzle", snow: "wx-snow", thunderstorm: "wx-storm", unknown: "",
 };
-
-function V2Badge() {
-  const reduce = useReducedMotion();
-  return (
-    <motion.span
-      className="logo-sub"
-      initial={{ scale: 1, opacity: 1 }}
-      animate={reduce ? {} : { scale: [1, 1.3, 1], opacity: [1, 0.55, 1] }}
-      transition={{ duration: 0.6, ease: "easeOut", times: [0, 0.5, 1] }}
-    >
-      v2
-    </motion.span>
-  );
-}
 
 function WeatherCluster({ weather }: { weather: WeatherNow | null }) {
   const [open, setOpen] = useState(false);
@@ -188,6 +174,8 @@ function LocationControl() {
     if (timer.current) window.clearTimeout(timer.current);
   }, []);
 
+  const label = status === "locating" ? "Locating…" : (userLoc?.name || "Current location");
+
   const reDetect = () => {
     if (status === "locating" || !navigator.geolocation) return;
     setStatus("locating");
@@ -201,7 +189,9 @@ function LocationControl() {
         timer.current = window.setTimeout(() => setStatus("idle"), 900);
       },
       () => {
+        // GPS refused/unavailable — keep the honest default centre and say so
         setUserLoc({ lat: 12.9716, lng: 77.5946, name: "Bengaluru" });
+        setFlyTo({ lat: 12.9716, lng: 77.5946 });
         setStatus("success");
         if (timer.current) window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => setStatus("idle"), 900);
@@ -213,20 +203,26 @@ function LocationControl() {
   return (
     <div
       className="loc-wrap"
-      data-tip={status === "locating" ? "Detecting location…" : "Detected via IP — click to use GPS"}
+      data-tip={
+        status === "locating"
+          ? "Detecting your location…"
+          : userLoc?.name
+            ? `${userLoc.name} — click to re-detect with GPS`
+            : "Using the Bengaluru centre — click to detect with GPS"
+      }
     >
       <motion.button
         type="button"
         className="loc-btn"
         onClick={reDetect}
-        aria-label="Re-detect current location"
-        whileHover={status === "idle" ? { scale: 1.08 } : undefined}
+        aria-label="Use my current location"
+        whileHover={status === "idle" ? { scale: 1.04 } : undefined}
         whileTap={{ scale: 0.95 }}
         animate={
           status === "locating"
             ? { rotate: 360 }
             : status === "success"
-              ? { scale: [1, 1.3, 1] }
+              ? { scale: [1, 1.14, 1] }
               : { rotate: 0, scale: 1 }
         }
         transition={
@@ -236,8 +232,10 @@ function LocationControl() {
         }
       >
         <span className="material-symbols-outlined">my_location</span>
+        <motion.span key={label} className="loc-btn-label" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          {label}
+        </motion.span>
       </motion.button>
-      <span className="muted truncate loc-name">{userLoc?.name ?? "Bengaluru"}</span>
     </div>
   );
 }

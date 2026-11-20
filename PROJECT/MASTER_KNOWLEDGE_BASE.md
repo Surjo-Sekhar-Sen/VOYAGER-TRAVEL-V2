@@ -323,7 +323,9 @@ VOYAGER_2/                                         ← NEW clean repo root (C:\U
   Docker/API required). Files: `test_data_layer.py` (12), `test_route_finder.py` (10),
   `test_segment_builder.py` (14), `test_prompt4.py` (33), `test_prompt5.py` (20),
   `test_traffic_model.py` (9), `test_no_fake_data.py` (6).
-- Frontend: `npx tsc --noEmit` zero errors; dev server :3000; axios talks to `http://localhost:8000/api`
+- Frontend: `npx tsc -b` zero errors (⚠️ `npx tsc --noEmit` is a NO-OP — the root tsconfig is
+  a solution file with `"files": []`, so it type-checks nothing; see §36); dev server :3000;
+  axios talks to `http://localhost:8000/api`
   directly + **CORS middleware** added in `backend/main.py` (see §20 #23).
 - Prompt 7 (ML + integration + fake-data audit) **DONE**: traffic model + `traffic-model-info` endpoint
   + benchmark all within budget. Prompts 8–9 fully *specified* (see §24) — build order is 8 → 9.
@@ -2865,3 +2867,257 @@ staggered, hover-sync with cards, and cluster at 5–10km; both floating windows
 glass over the map. Frontend files touched: `SearchPanel.tsx/.css`, `MapView.tsx`, `AppContext.tsx`,
 `MainPage.css`, `index.css`, `package.json` (+framer-motion, +react-leaflet-cluster). Docs: this
 §35 + PROMPT_6 §2/§4/§6/§12/§15 updated.*
+
+---
+
+## 36. The 2026-10-14 Bug-Hunt Session — the frontend build was actually RED (the QA command lied), plus hop/API data bugs
+
+> Trigger: owner reported "the frontend isn't loading properly, some error is coming" and that the
+> hop-by-hop system + APIs "have a lot of problems". Everything below was reproduced, fixed and
+> re-verified on this machine.
+
+### 36.1 Root cause #1 — the QA command `npx tsc --noEmit` checks NOTHING (23 real errors were hidden)
+- `frontend/tsconfig.json` is a **solution file**: `{"files": [], "references":[app, node]}`.
+  `tsc --noEmit` type-checks zero files → always "0 errors". Every session doc that says
+  "`npx tsc --noEmit` → 0 errors" was a **false green**.
+- The real check is `npx tsc -b` (what `npm run build` runs). It reported **23 errors across
+  7 files** — i.e. `npm run build` was broken, so the production bundle could not be produced.
+  The dev server still rendered (Vite/esbuild does not type-check), which is why the app "loaded"
+  while the build failed.
+- **Fix:** use `npx tsc -b` from now on (AGENTS.md + §7 corrected). Errors fixed, one by one:
+  - `AskAssistant.tsx` imported a **non-existent type `AskContext`** and called a **non-existent
+    `api.ask`** → added `AskContext`/`AskResponse` to `types/index.ts` and a real `api.ask()`
+    that POSTs `/langgraph/ask` (the endpoint already existed; the component compiles and works
+    now — it is still not mounted anywhere, so it has no user-visible effect yet).
+  - `MapView.tsx`: `L.point(size)` (single-arg overload not in `@types/leaflet`) → `L.point(size, size)`;
+    `chosen` possibly-undefined narrowing → `const chosen = [...] ?? []`;
+    `import type { MarkerCluster } from "leaflet.markercluster"` **has no module export** — the
+    `@types/leaflet.markercluster` package is an *augmentation* (`L.MarkerCluster`) → install it
+    (new devDependency) and add `"leaflet.markercluster"` to `tsconfig.app.json` `"types"`
+    (otherwise the augmentation is never loaded).
+  - `SearchPanel.tsx`: `animate(0, value, {...})` matched no framer-motion v12 overload → the
+    rating CountUp now uses a plain `requestAnimationFrame` tween (same 400 ms + delay, no magic
+    cast); `toggleCategory` typed `React.MouseEvent<HTMLElement>` (an `onClick` gives a MouseEvent,
+    not a PointerEvent) so `spawnRipple(e.currentTarget, ...)` type-checks.
+  - `HopTreeView.tsx`: `dest ?? undefined` passed a `LatLng` (name optional) where `StopRef`
+    (name required) was expected → build the `StopRef` explicitly.
+  - `HeaderBar.tsx`: dead `V2Badge` (unused) → deleted (`noUnusedLocals` errored on it).
+- **Verify:** `npx tsc -b` → 0 errors · `npm run build` → succeeds (~629 kB bundle).
+
+### 36.2 Root cause #2 — `AppContext` served STALE state (silently broke hover-sync + the radius slider)
+- The context value was wrapped in `useMemo(... , [deps])` whose dependency list **omitted**
+  `radiusKm`, `hoveredPlaceId`, `searching` and `searched` (oxlint flagged it). Consumers therefore
+  kept the old snapshot until some *other* dep changed: card↔pin hover highlighting and the
+  "N km" radius readout/CTA state could stay frozen.
+- **Fix:** build the context object on every render (it is ~35 cheap assignments). No `useMemo`.
+- Also removed an unused `LiveContext` import (it was a `noUnusedLocals` error).
+
+### 36.3 Root cause #3 — `SegmentFlowView` fetched segment 1 from inside a `useMemo`
+- `useMemo(() => { loadInitial() }, [])` is a side effect in a pure hook: React may run it twice
+  (StrictMode does) or skip it, so opening the hop panel fired **two** `/routes/segments` requests.
+- **Fix:** moved to `useEffect(..., [])`.
+
+### 36.4 Root cause #4 — `current_time` was silently ignored by the segment builder (wrong hop times)
+- `_parse_current_time()` only tried `datetime.fromisoformat()`, which **rejects a bare clock time**
+  (`"09:00"`, `"09:00:00"`). The API then silently fell back to the wall clock — a request for
+  09:00 at 23:24 returned the 22:00 "bus service limited" warning and night-time (walk-only) options.
+- **Fix:** also accept `%H:%M:%S` / `%H:%M`. Verified via API: `current_time="09:00"` now returns
+  the same result set as `"2026-07-31T09:00:00+05:30"` (36 bus options, real GTFS shapes).
+
+### 36.5 Root cause #5 — fake "0.0 km / 1 min" bus hops in the tree
+- `_bus_ride_option` priced a ride by `_route_ride_duration()`, which returns `(1, 0.0)` when the
+  route shape does not resolve between the boarding stop and the arrival stop (loop shapes /
+  unlisted stops). The tree then offered a leg with `distanceKm: 0.0`, `durationMin: 1` and a
+  straight-line `interpolated` geometry — a fabricated leg (violates "no fake data").
+- **Fix:** such a ride is not offered at all (`if dist_m <= 0: return None`). Verified via API:
+  0 zero-km bus options across 36 bus options on the Yelahanka → Wonderla case.
+- **Known limitation (not fixed, by design):** from Yelahanka 4th Phase almost no route heads
+  toward a north-east destination (Sai Vidya), so the tree legitimately offers several short
+  local hops instead of one long haul. `FORWARD_TOLERANCE_M = 500` also admits stops that make
+  no real progress; tightening it changes routing behaviour and needs its own session + tests.
+
+### 36.6 Root cause #6 — the LangGraph live layer 500'd on EVERY call after the first (shared pool shut down)
+- `VoyagerLangGraph.gather_route_context()` dispatched its parallel tools with
+  `with self._pool as pool:` — but `ThreadPoolExecutor.__exit__` calls `shutdown()`, and `self._pool`
+  is a **long-lived singleton** (the agent is built once in `app_state`). So the *first*
+  `/langgraph/route-context` (or `/langgraph/ask`, which calls it) succeeded and every later call
+  raised `RuntimeError: cannot schedule new futures after shutdown` → **HTTP 500**.
+- **Impact:** the live layer (weather/traffic/news/prices + `AskAssistant`) broke permanently after
+  one request — exactly the "APIs have a lot of problems" symptom.
+- **Fix:** submit on the shared pool directly, never inside `with`. Verified: 3 sequential
+  `/langgraph/route-context` + 3 sequential `/langgraph/ask` → all HTTP 200; in-process 3/3 OK.
+- The other `ThreadPoolExecutor` in the codebase (`app_state._load_all`) is *correct* — it is
+  created and shut down inside one one-shot load.
+
+### 36.7 A stale/broken backend was squatting on :8000
+- Two python processes were listening on **:8000** (a `--reload` parent + its worker). The port
+  was held by an old worker whose state had gone bad: it served 500 on `/langgraph/*` and would
+  not die (`taskkill` reported "process not found" while the socket stayed bound, and a second
+  `uvicorn` start failed with `[Errno 10048]`).
+- **Fix:** kill every `uvicorn`/multiprocessing python process, then start ONE backend on :8000
+  (`backend/venv/Scripts/python.exe -m uvicorn backend.main:app --reload --port 8000`). Never run
+  two servers on :8000 — the frontend hits `http://localhost:8000/api` directly.
+
+### 36.8 Environment findings (this machine)
+- Two PowerShell python processes were both **listening on :8000** (a `--reload` parent + child,
+  launched from `C:\Windows\Python3.7\python.exe`). Only one serves; a *second* `uvicorn` start
+  fails with `[Errno 10048]`. The live one is serving v2 correctly (`/openapi.json` →
+  `"VOYAGER v2" 0.3.0`), so the frontend talks to the right backend — but do not start a second
+  server on :8000. Vite binds `localhost` (IPv6) only: test with `http://localhost:3000`, not
+  `127.0.0.1:3000`.
+- `backend/venv` has **no pytest** installed, so `python -m pytest` must use the global Python
+  (or install pytest into the venv).
+
+### 36.9 Verification (this session, all green)
+- `python -m pytest tests/ -q` → **122 passed** (still 122 after the backend changes).
+- `npx tsc -b` → **0 errors** (was 23) · `npm run build` → success · `npx oxlint` → 0 errors
+  (7 `only-export-components` warnings remain, unchanged/benign).
+- Headless Chrome (`--headless=new --dump-dom --enable-logging=stderr`) on `http://localhost:3000`:
+  full app renders (`app-shell`, header, input window, Leaflet map, bottom nav, news popup),
+  **zero console errors**.
+- Live API probes (all 18 endpoints in `routes.py`, via HTTP on :8000): **17/18 → 200**, repeated
+  `/langgraph/route-context` + `/langgraph/ask` calls all 200; `current_time` honoured; no 0-km hop
+  options. The only non-200 is `GET /photo` — see the note below.
+- ⚠️ NOT verified: `GET /api/photo`. Google Places billing is currently off, so the search results
+  carry no `photo_name` and there is nothing to fetch (the endpoint correctly 404s on a bogus name).
+  Re-test once Google billing is re-enabled and real `photo_name`s come back.
+
+*Session 2026-10-14 complete. Frontend files touched: `context/AppContext.tsx`,
+`components/HeaderBar.tsx`, `components/MapView.tsx`, `components/SearchPanel.tsx`,
+`components/HopTreeView.tsx`, `components/SegmentFlowView.tsx`, `services/api.ts`, `types/index.ts`,
+`tsconfig.app.json`, `package.json` (+`@types/leaflet.markercluster`). Backend: `segment_builder.py`.
+Docs: `AGENTS.md`, §7 and this §36.*
+
+## 37. The 2026-10-15 Session — hop mechanism (walks + GTFS sequence bug), review photos/analysis, Nearby-from-search, location button
+
+Owner asks answered here in order: (a) the hop tree never showed the WALK between hops, (b) the last
+leg should be walkable when short, (c) prefer the bus that runs all the way instead of a huge detour,
+(d) review images were not coming + the AI review analysis should be better/more accurate, (e) Nearby
+should use the place the user just searched, (f) a small "current location" button at the top.
+
+### 37.1 THE BIG ONE — every GTFS shape's stop sequence was duplicated once per trip
+`GtfsService._shape_stops_index()` built `shape_id -> [(seq, stop_name)]` straight from
+`stop_to_shapes`, which records one `(shape, seq)` entry **per stop per trip**. A shape used by 72
+trips therefore listed each of its stops 72 times: `402-B DOWN` was **720 entries for 10 distinct
+stops** (`yelahanka 5th phase` x72, then `shrusti school yelahanka` x72, ...).
+
+Consequences (silent, and exactly the "the bus never goes till the destination" symptom):
+- `SegmentBuilder._route_forward_stops()` uses `names.index(from_stop)` — the FIRST copy of a long
+  duplicate run — so "stops after X" was mostly X repeated. `_spaced_arrival_stops()` then collapsed
+  to a single ~0.5 km micro-hop per route instead of the real 15-20 km ride.
+- `_route_ride_duration()` sliced `names[min(i,j):max(i,j)]` between garbage indexes (wrong km/min).
+- `_metro_transfer_stop()` searched the same meaningless list.
+
+**Fix:** collapse exact `(shape, seq, stop)` repeats in `_shape_stops_index()` (real revisit of a stop
+at a different position is preserved for out-and-back shapes). `402-B DOWN` is now 10 clean stops.
+Effect: Yelahanka 4th Phase → MG Road now recommends **G-9 (dep 09:17, 8 min wait) → CSI Hospital,
+15.7 km, 1.7 km left** instead of a 0.46 km hop into the same neighbourhood.
+- The transit topology pickle was built from the polluted sequences → added `GRAPH_CACHE_VERSION` to
+  `transit_graph.py` so the cache rebuilds when the topology semantics change (19,344 bus edges).
+- `scripts/browser_flows.py` caught a regression I introduced while rewriting the tree: making the
+  alternative fan iterate only over real leg columns removed the entire FIRST-HOP fan before any leg
+  was chosen. The source column is now level 0 (each chosen leg `d` is level `d+1`).
+
+### 37.2 Hop mechanism — walks are now part of the journey
+- **Transfer walk:** `accessWalk` is emitted for EVERY transit option (not just the first), with
+  `isTransferWalk: true` when the boarding stop differs from the stop the previous leg ended at.
+  `HopTreeView` now draws a walk column before every transit leg (hidden below 50 m) and
+  `SegmentFlowView` shows it in the breadcrumb ("Walk to …", "Transfer walk to …").
+- **Final walk (`isFinalWalk`):** a new `_add_final_walk()` offers the walkable last leg straight to
+  the destination whenever the anchor is within `FINAL_WALK_MAX_M = 2200 m` (~20 min). It is added
+  *after* the circling filter (ending on foot is never "circling back"), and it becomes the
+  recommendation when the walk is <= `WALK_PRIMARY_M` (1.5 km). MG Road → Cubbon Park (1.37 km) now
+  recommends "walk 1.37 km / 16 min", with fare 0.
+- **"not_running" was a lie:** it meant "next bus is >45 min away", which printed
+  "no more scheduled buses today" at 09:00 for a bus 58 min out. It now means what it says: the
+  windowed departure scan (`DEP_WINDOW_MIN = 180`) found nothing for that stop. A real-but-distant
+  departure is `scheduled` + `longWait: true` + a real `waitMin`, and the warning names the longest wait.
+- **Recommendation:** `_mark_top_recommended()` no longer headlines a ride you cannot catch — it
+  prefers options with `waitMin <= MAX_TOP_WAIT_MIN = 30` (and not `not_running`) before ranking by
+  "closest to the destination". Previously a 133-minute wait beat an 8-minute one.
+- New option fields: `waitMin`, `longWait`, `reachesNearDestination`, `remainingToDestKm`,
+  `isFinalWalk`; new `accessWalk` field `isTransferWalk`. Metro options carry
+  `waitMin = METRO_HEADWAY_MIN` (estimated headway).
+
+### 37.3 Reviews — photos were never read, and the analysis only saw ~5 reviews
+- SerpAPI's google_maps response already contained the place **`thumbnail`** (1000x1000 Google image,
+  200/284 KB) and a real per-star **`rating_summary`** (e.g. 5*:38910, 4*:17833, ... over 62,758
+  ratings). `SerpAPIClient` parsed NEITHER, so every card fell back to the grey "no photo" icon and
+  the reliability score was computed from the handful of review bodies SerpAPI returns.
+- Fixed: `search_place()`/`place_details()` now capture `thumbnail`, `photo_url`, `photos_link`,
+  `rating_distribution`, plus reviewer `avatar` (`user_thumbnail`) and `author_review_count`;
+  `ReviewTools` propagates the photo through `_resolve`/`_build_details`; the rating used for
+  reliability is now the **tally-weighted mean over all ratings** (more accurate than Google's
+  rounded 4.5). `_CACHE_VERSION` was bumped so stale cached details do not hide the new fields.
+- **Analysis:** the LLM now receives each review with its real star rating + Google's real per-star
+  tally and returns `summary` + `positives` + `concerns` + `verdict` (all rendered, with a real
+  per-star breakdown and reviewer avatars). Low-star reviews are never truncated away, review texts
+  are clamped to 1200 chars, and when no LLM is reachable a deterministic heuristic still describes
+  the real data ("90% of all 62,758 ratings are 4+ stars (average 4.5/5)"), tagged `summary_source`
+  (`llm` | `heuristic` | `none`).
+- **Crash found on the way:** SerpAPI returns `type` as a **list** for businesses, and
+  `Place.primary_type` is a `str` → pydantic `ValidationError` → the whole search came back empty.
+  `_serp_to_place()` now normalises `type` into `primary_type` + `types`.
+- **LLM layer was silently dead:** the configured `OPENROUTER_API_KEY` returns `401 User not found`,
+  and the default Gemini model `gemini-2.0-flash` is **retired (404)**. Both `LLMAgent` and
+  `review_summarizer` now walk a model-fallback chain (`gemini-2.5-flash` → `gemini-3.8-flash` →
+  `gemini-flash-latest` → `gemini-flash-lite-latest` → `gemini-3.6-flash`), treat retired ids /
+  503-overloaded / 429-quota / timeouts as "try the next model", and put a provider whose
+  credentials are rejected on a 10-minute cooldown instead of paying a round trip on every call.
+  Two further traps fixed: reasoning models spend output tokens *before* the JSON, so `max_tokens`
+  went 420 → 2600 (at 420 the reply was the literal string `{\n  "`), and replies are parsed with a
+  tolerant `parse_json_loose()`.
+- Re-test note: `GET /api/photo` (the Google-Places-photo proxy) is still unverifiable while Google
+  billing is off. SerpAPI photos go straight from `lh3.googleusercontent.com` (rewritten to a
+  640x420 crop by the panel) and need no proxy.
+
+### 37.4 Nearby now uses the searched place + a visible location button
+- `AppContext.searchAnchor` (name/lat/lng) is set by `runSearch()` and **survives**
+  `clearTransient()`. Switching to the Nearby tab no longer wipes the searched place, so the base
+  order is: pinned/clicked result → last search → GPS → city centre. The banner says
+  "Near your search: <place>", with a **"My location"** button to re-base on GPS and a "Clear".
+  `switchTab()` resets only the visible results (it used to call `clearTransient()`, which threw the
+  location away and silently fell back to GPS).
+- The header location control is now a small labelled pill (**"Current location"** / the resolved
+  place name, 32 px tall, tooltip with the source) instead of an icon-only circle; it re-detects GPS,
+  flies to the result, and on GPS refusal keeps the honest "Bengaluru" centre.
+
+### 37.5 Verification (this session, all green)
+- `python -m pytest tests/ -q` → **122 passed** (after the shape-index fix, the walk legs, the
+  wait/status change and the ranking change).
+- `npx tsc -b` → **0 errors** · `npm run build` → success · `npx oxlint` → 0 errors (same 7 benign
+  `only-export-components` warnings).
+- Live probes against :8000 (the same checks as `scripts/browser_flows.py` step 1-5 minus the
+  browser): search returns a real `photo_name`, enrich returns photo +
+  `rating_distribution` + `verdict` + `reviews_sampled`, `/routes/segments` returns the final walk
+  (and makes it the recommendation for a 1.4 km hop), the long-trip top pick is a catchable 15.7 km
+  ride, `/routes/segment-next` keeps the transfer-walk flag.
+- **Real browser drive** (`scripts/browser_check.py` + `scripts/browser_flows.py`, dependency-free
+  CDP over a raw WebSocket): header location pill visible (106x32) · search → Details shows the hero
+  image **loaded** (`naturalWidth > 0`), 5 rating bars, verdict, 5 reviewer avatars · search → Nearby
+  banner reads "Near your search: Toit" · A→B hop tree renders `walk · 0.4 km` → `Green · 12.8 km`
+  and after taking the hop another `walk · 0.5 km` → `114 · 2.6 km`, breadcrumb
+  "Rajajinagar › Walk to Mahakavi Kuvempu Road › Green metro (5m wait) › Chickpete › Bengaluru" ·
+  **0 console errors**.
+- Environment: :8000 must run ONE backend. This session again found two python processes listening on
+  :8000 (one from `C:\Windows\Python3.7\python.exe`); killed both, started a single `backend/venv`
+  uvicorn (no `--reload`), deleted the stale `transit_graph.pkl` so the topology rebuilt cleanly.
+
+### 37.6 Still open / not verified
+- `GET /api/photo` (Google Places photo proxy) cannot be exercised while Google Places billing is off
+  — the endpoint correctly 404s on a bogus name; re-test when billing returns. SerpAPI photos do not
+  use it.
+- The OpenRouter key in `.env` is dead (`401 User not found`) — the Gemini path carries the LLM work
+  until it is renewed.
+- `FORWARD_TOLERANCE_M = 500` (bus) still admits arrival stops that make almost no progress; the
+  shape-sequence fix removed the worst symptom (single micro-hop per route), but a stricter
+  "must actually get closer" rule is still an open improvement.
+- The hop tree is still locally greedy (it only fans out from stops already reached); a global
+  best-route comparison is the `quick-suggestion` (A*) endpoint's job, not this tree's.
+
+*Session 2026-10-15 complete. Backend: `gtfs_service.py`, `transit_graph.py`, `segment_builder.py`,
+`clients/serpapi_client.py`, `search_service.py`, `review_tools.py`, `agents/review_summarizer.py`,
+`agents/llm_agent.py`, `data_schema.py`. Frontend: `types/index.ts`, `context/AppContext.tsx`,
+`components/SearchPanel.tsx`, `components/HopTreeView.tsx`, `components/SegmentFlowView.tsx`,
+`components/DiscoveryPanel.tsx` (+css), `components/HeaderBar.tsx` (+css). Tooling:
+`scripts/browser_check.py`, `scripts/browser_flows.py` (new, dependency-free browser verification).*

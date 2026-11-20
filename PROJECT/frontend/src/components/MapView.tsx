@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker, Circle, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
-import type { MarkerCluster } from "leaflet.markercluster";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useApp, scoreClass } from "../context/AppContext";
-import type { Coord, HopOption, LatLng } from "../types";
+import type { Coord, HopOption, LatLng, TripPlanPlace } from "../types";
+import { dayColor, hopKey } from "./tripTheme";
 
 const NUM_COLORS = [
   "#6c5ce7", "#00cec9", "#fd79a8", "#f39c12", "#27ae60",
@@ -38,13 +38,14 @@ function numIcon(n: number, delayMs = 0) {
 }
 
 // cluster bubble for wide-radius searches: count badge, splits apart on zoom
-function clusterIcon(cluster: MarkerCluster) {
+function clusterIcon(cluster: L.MarkerCluster) {
   const n = cluster.getChildCount();
   const tier = n < 10 ? "small" : n < 50 ? "medium" : "large";
+  const size = tier === "small" ? 40 : tier === "medium" ? 48 : 56;
   return L.divIcon({
     className: "cluster-icon",
     html: `<div class="cluster-num ${tier}"><span>${n}</span></div>`,
-    iconSize: L.point(tier === "small" ? 40 : tier === "medium" ? 48 : 56),
+    iconSize: L.point(size, size),
   });
 }
 function starIcon() {
@@ -109,10 +110,10 @@ function NearbyRadius() {
 
 function RoutePolylines() {
   const { journey, ridePath } = useApp();
-  const chosen = journey.chosenLegs as HopOption[] | undefined;
+  const chosen: HopOption[] = (journey.chosenLegs as HopOption[]) ?? [];
   const lines: { pts: Coord[]; mode: string; hop: number }[] = [];
 
-  for (const opt of chosen ?? []) {
+  for (const opt of chosen) {
     const pts = legGeometry(opt);
     if (pts.length < 2) continue;
     const hopIdx = chosen.findIndex((c) => c.optionId === opt.optionId) + 1;
@@ -241,6 +242,118 @@ function Pins() {
   );
 }
 
+// ---------------------------------------------------------------- trip layer
+function tripPinIcon(n: number, color: string) {
+  return L.divIcon({
+    className: "",
+    html: `<div class="trip-pin-wrap"><div class="trip-pin" style="--pin-color:${color}"><span>${n}</span></div><div class="trip-pin-tail" style="--pin-color:${color}"></div></div>`,
+    iconSize: [32, 40],
+    iconAnchor: [16, 38],
+    popupAnchor: [0, -34],
+  });
+}
+
+function TripLayer() {
+  const {
+    mode, tripPlan, tripDay, tripTransports, tripHopRoute,
+    setTripSelectedPlace, setFlyTo,
+  } = useApp();
+  if (mode !== "trip" || !tripPlan) return null;
+
+  const days = tripDay == null ? tripPlan.days : tripPlan.days.filter((d) => d.day === tripDay);
+  const legs: { key: string; day: number; from: TripPlanPlace; to: TripPlanPlace }[] = [];
+  for (const d of days) {
+    for (let i = 0; i < d.places.length - 1; i += 1) {
+      legs.push({ key: hopKey(d.day, d.places[i], d.places[i + 1]), day: d.day, from: d.places[i], to: d.places[i + 1] });
+    }
+  }
+
+  return (
+    <>
+      {days.map((d) => d.places.map((p, i) => {
+        const color = dayColor(d.day);
+        return (
+          <Marker
+            key={`${d.day}-${p.id}`}
+            position={[p.lat, p.lng]}
+            icon={tripPinIcon(i + 1, color)}
+            eventHandlers={{
+              click: () => setFlyTo({ lat: p.lat, lng: p.lng, name: p.name }),
+            }}
+          >
+            <Popup>
+              <div className="trip-popup">
+                <div className="trip-popup-day" style={{ color }}>Day {d.day} · stop {i + 1}</div>
+                <b>{p.name}</b>
+                <div className="muted">{p.suggested_start}{p.suggested_end ? ` – ${p.suggested_end}` : ""} · {p.category}</div>
+                <button className="trip-popup-btn" onClick={() => setTripSelectedPlace(p)}>View place details</button>
+                <button className="trip-popup-btn ghost" onClick={() => setFlyTo({ lat: p.lat, lng: p.lng, name: p.name })}>Centre map</button>
+              </div>
+            </Popup>
+          </Marker>
+        );
+      }))}
+
+      {legs.map((leg) => {
+        const color = dayColor(leg.day);
+        const choice = tripTransports[leg.key];
+        const straight: Coord[] = [[leg.from.lat, leg.from.lng], [leg.to.lat, leg.to.lng]];
+        if (choice && choice.geometry.length > 1) {
+          return (
+            <Polyline
+              key={`chosen-${leg.key}`}
+              positions={choice.geometry}
+              color={choice.mode === "walk" ? "#95a5a6" : color}
+              weight={choice.mode === "transit" ? 6 : 5}
+              opacity={0.95}
+              dashArray={choice.mode === "walk" ? "7 9" : undefined}
+            />
+          );
+        }
+        return (
+          <Polyline
+            key={`dash-${leg.key}`}
+            positions={straight}
+            color={color}
+            weight={2.5}
+            opacity={0.5}
+            dashArray="2 8"
+          />
+        );
+      })}
+
+      {tripHopRoute && tripHopRoute.geometry.length > 1 && (
+        <Polyline
+          positions={tripHopRoute.geometry}
+          color="#f39c12"
+          weight={6}
+          opacity={0.95}
+          dashArray={tripHopRoute.mode === "walk" ? "6 8" : undefined}
+        />
+      )}
+    </>
+  );
+}
+
+function TripFit() {
+  const map = useMap();
+  const { mode, tripPlan, tripDay } = useApp();
+  useEffect(() => {
+    if (mode !== "trip" || !tripPlan) return;
+    const days = tripDay == null ? tripPlan.days : tripPlan.days.filter((d) => d.day === tripDay);
+    const pts: [number, number][] = [];
+    for (const d of days) for (const p of d.places) {
+      if (inBengaluru(p.lat, p.lng)) pts.push([p.lat, p.lng]);
+    }
+    if (pts.length > 1) {
+      map.fitBounds(L.latLngBounds(pts), { padding: [56, 56], maxZoom: 14 });
+    } else if (pts.length === 1) {
+      map.setView(pts[0], 14);
+    }
+  }, [mode, tripPlan, tripDay, map]);
+  return null;
+}
+
 function JourneyPosition() {
   const { journey } = useApp();
   if (!journey.active || !journey.position) return null;
@@ -298,6 +411,8 @@ export default function MapView() {
       <RoutePolylines />
       <ConfirmedLegs />
       <JourneyPosition />
+      <TripLayer />
+      <TripFit />
     </MapContainer>
   );
 }

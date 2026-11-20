@@ -1,5 +1,7 @@
 import axios from "axios";
 import type {
+  AskContext,
+  AskResponse,
   DriveRoute,
   LatLng,
   NewsItem,
@@ -9,6 +11,7 @@ import type {
   RidePrice,
   SegmentResponse,
   TripPlan,
+  TripPlanPlace,
   WeatherNow,
 } from "../types";
 
@@ -28,16 +31,27 @@ export interface Api {
   routeSegments: (src: LatLng, dst: LatLng, groupSize: number, budget: number, currentTime?: string | null, signal?: AbortSignal) => Promise<SegmentResponse>;
   segmentNext: (journey: unknown, chosenLegs: unknown[], groupSize: number, budget: number) => Promise<SegmentResponse>;
   driveRoute: (origin: LatLng, dest: LatLng) => Promise<DriveRoute>;
+  ask: (message: string, context?: AskContext) => Promise<AskResponse>;
   tripPlan: (p: TripPlanRequest) => Promise<TripPlan>;
+  tripDiscover: (p: TripPlanRequest & { limit?: number }) => Promise<TripDiscoverResponse>;
 }
 
 export interface TripPlanRequest {
   destination: string;
   interests: string[];
+  categories: string[];
   group_type: string;
   days: number;
   pace: string;
   budget?: number;
+}
+
+export interface TripDiscoverResponse {
+  destination: string;
+  places: TripPlanPlace[];
+  data_source: string;
+  disclaimer: string;
+  relaxed: boolean;
 }
 
 export const api: Api = {
@@ -121,8 +135,25 @@ export const api: Api = {
     return data;
   },
 
+  async ask(message, context) {
+    // ask about the destination when there is one, else about the source
+    const focus = context?.destination ?? context?.source ?? null;
+    const { data } = await http.post<AskResponse>("/langgraph/ask", {
+      message,
+      lat: focus?.lat ?? null,
+      lng: focus?.lng ?? null,
+      context: context ?? null,
+    });
+    return data;
+  },
+
   async tripPlan(p) {
     const { data } = await http.post<TripPlan>("/trip/plan", p);
+    return data;
+  },
+
+  async tripDiscover(p) {
+    const { data } = await http.post<TripDiscoverResponse>("/trip/places", p);
     return data;
   },
 };

@@ -1,14 +1,30 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../context/AppContext";
 import { api, type TripPlanRequest } from "../services/api";
-import type { GroupType, Pace, PlaceResult, TripInputData, TripPlacePick, BudgetSplits, TripPlan } from "../types";
+import type {
+  BudgetSplits, GroupType, Pace, TripInputData, TripPlanDay, TripPlanPlace,
+} from "../types";
+import { categoryMeta, dayColor, fmtFee, fmtMins } from "./tripTheme";
+import { photoUrl } from "./PlaceBits";
+import TripHopBlock from "./TripHopBlock";
 import "./TripPanel.css";
 
-// ------------------------------------------------------------------ static option sets
-const INTERESTS = [
-  "Beaches", "Temples", "Food", "Shopping", "Nature", "Adventure",
-  "Historical", "Nightlife", "Museums", "Wildlife", "Family-friendly",
-] as const;
+const BENGALURU = { name: "Bengaluru", lat: 12.9716, lng: 77.5946 };
+
+// ---------------------------------------------------------------- option sets
+const CATEGORIES: { key: string; label: string; icon: string }[] = [
+  { key: "heritage", label: "Heritage", icon: "account_balance" },
+  { key: "religious", label: "Temples", icon: "temple_hindu" },
+  { key: "nature", label: "Nature & parks", icon: "park" },
+  { key: "food", label: "Food & cafes", icon: "restaurant" },
+  { key: "museum", label: "Museums & art", icon: "museum" },
+  { key: "shopping", label: "Shopping", icon: "shopping_bag" },
+  { key: "adventure", label: "Adventure", icon: "attractions" },
+  { key: "nightlife", label: "Nightlife", icon: "local_bar" },
+  { key: "wellness", label: "Wellness", icon: "spa" },
+  { key: "offbeat", label: "Offbeat", icon: "explore" },
+  { key: "photo", label: "Photo spots", icon: "photo_camera" },
+];
 
 const GROUP_TYPES: { key: GroupType; label: string; icon: string }[] = [
   { key: "solo", label: "Solo", icon: "person" },
@@ -19,18 +35,18 @@ const GROUP_TYPES: { key: GroupType; label: string; icon: string }[] = [
 ];
 
 const PACES: { key: Pace; label: string; desc: string; icon: string }[] = [
-  { key: "relaxed", label: "Relaxed", desc: "1–2 spots/day, slow", icon: "spa" },
-  { key: "balanced", label: "Balanced", desc: "3–4 spots/day", icon: "balance" },
-  { key: "packed", label: "Packed", desc: "5+ spots/day, fast", icon: "bolt" },
+  { key: "relaxed", label: "Relaxed", desc: "2 spots/day, slow", icon: "spa" },
+  { key: "balanced", label: "Balanced", desc: "4 spots/day", icon: "balance" },
+  { key: "packed", label: "Packed", desc: "6 spots/day, fast", icon: "bolt" },
 ];
 
 const AUTO_SPLITS: BudgetSplits = { stay: 35, food: 25, transport: 15, attractions: 20, misc: 5 };
 const SPLIT_KEYS: (keyof BudgetSplits)[] = ["stay", "food", "transport", "attractions", "misc"];
 
 const DEFAULT_DRAFT: TripInputData = {
-  destination: null,
+  destination: BENGALURU,
   suggestDestination: false,
-  durationMode: "dates",
+  durationMode: "days",
   startDate: null,
   endDate: null,
   days: 3,
@@ -40,12 +56,13 @@ const DEFAULT_DRAFT: TripInputData = {
   budget: 10000,
   budgetShape: "total",
   budgetSplits: { ...AUTO_SPLITS },
+  categories: ["heritage", "food", "nature"],
   interests: [],
   pace: "balanced",
 };
 
 const STEP_TITLES = [
-  "Where to?", "How long?", "Your group", "Budget", "Interests", "Pace", "Review & generate",
+  "Where to?", "How long?", "Your group", "Budget", "What you love", "Pace", "Review & generate",
 ];
 
 function daysBetween(start: string | null, end: string | null): number {
@@ -56,50 +73,6 @@ function daysBetween(start: string | null, end: string | null): number {
   return Math.round((b - a) / 86400000) + 1;
 }
 
-// ------------------------------------------------------------------ destination autocomplete
-function DestinationInput({ value, onPick }: { value: TripPlacePick | null; onPick: (p: TripPlacePick | null) => void }) {
-  const { userLoc } = useApp();
-  const [q, setQ] = useState(value?.name ?? "");
-  const [sugg, setSugg] = useState<PlaceResult[]>([]);
-
-  useEffect(() => { setQ(value?.name ?? ""); }, [value]);
-
-  useEffect(() => {
-    if (q.trim().length < 2) { setSugg([]); return; }
-    const id = setTimeout(async () => {
-      try { setSugg((await api.searchPlaces(q, userLoc?.lat, userLoc?.lng)).slice(0, 5)); }
-      catch { setSugg([]); }
-    }, 300);
-    return () => clearTimeout(id);
-  }, [q, userLoc]);
-
-  return (
-    <div className="auto">
-      <span className="auto-dot" style={{ background: "var(--primary)" }} />
-      <input
-        className="text-input"
-        placeholder="Search a city or region"
-        value={q}
-        onChange={(e) => { setQ(e.target.value); if (e.target.value !== value?.name) onPick(null); }}
-      />
-      {sugg.length > 0 && (
-        <div className="suggest glass-strong">
-          {sugg.map((s) => (
-            <button key={s.place_id} className="suggest-item" onClick={() => {
-              const pick: TripPlacePick = { name: s.name, lat: s.lat, lng: s.lng };
-              onPick(pick); setQ(s.name); setSugg([]);
-            }}>
-              <span className="material-symbols-outlined">location_on</span>
-              <span><b>{s.name}</b><div className="muted small">{s.address}</div></span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ------------------------------------------------------------------ budget split sliders
 function splitSum(s: BudgetSplits): number {
   return SPLIT_KEYS.reduce((sum, k) => sum + Math.round(s[k] || 0), 0);
 }
@@ -109,7 +82,7 @@ function adjustSplit(prev: BudgetSplits, key: keyof BudgetSplits, value: number)
   const others = SPLIT_KEYS.filter((k) => k !== key);
   const otherSum = SPLIT_KEYS.reduce((s, k) => (k === key ? s : s + (prev[k] || 0)), 0);
   const remaining = 100 - clamped;
-  let next = { ...prev, [key]: clamped };
+  const next = { ...prev, [key]: clamped };
   const scale = otherSum > 0 ? remaining / otherSum : 0;
   others.forEach((k) => { next[k] = Math.round((prev[k] || 0) * scale); });
   const delta = 100 - (clamped + others.reduce((s, k) => s + next[k], 0));
@@ -121,143 +94,280 @@ const SPLIT_LABELS: Record<keyof BudgetSplits, string> = {
   stay: "Stay", food: "Food", transport: "Transport", attractions: "Attractions", misc: "Misc",
 };
 
-// ------------------------------------------------------------------ trip plan generation
-const INTEREST_TO_TAG: Record<string, string> = {
-  Beaches: "nature", Temples: "religious", Food: "food", Shopping: "shopping",
-  Nature: "nature", Adventure: "adventure", Historical: "heritage",
-  Nightlife: "nightlife", Museums: "museum", Wildlife: "nature",
-};
-
+// ---------------------------------------------------------------- planning glue
 function requestFromTrip(t: TripInputData): TripPlanRequest {
-  const name = t.destination?.name ?? "";
-  const slug = name.trim().toLowerCase().replace(/[^a-z]+/g, "") || "bengaluru";
-  const tags = Array.from(new Set(
-    t.interests.map((i) => INTEREST_TO_TAG[i]).filter(Boolean) as string[],
-  ));
-  let group = t.groupType === "seniors" ? "senior" : t.groupType;
-  if (group === "family") group = t.hasKids ? "family_kids" : "family";
+  const group = t.groupType === "seniors" ? "senior" : t.groupType;
   const totalBudget = t.budgetShape === "perPerson" ? t.budget * t.groupSize : t.budget;
   return {
-    destination: slug,
-    interests: tags,
-    group_type: group,
+    destination: "bengaluru",
+    interests: [],
+    categories: t.categories,
+    group_type: group === "family" ? (t.hasKids ? "family_kids" : "family") : group,
     days: Math.max(1, t.days),
     pace: t.pace,
     budget: totalBudget,
   };
 }
 
-function fmtMins(m: number): string {
-  if (m < 60) return `${m} min`;
-  const h = Math.floor(m / 60);
-  const r = m % 60;
-  return r ? `${h}h ${r}m` : `${h}h`;
+function requestKey(t: TripInputData): string {
+  return JSON.stringify({
+    c: t.categories, d: t.days, g: t.groupType, k: t.hasKids,
+    n: t.groupSize, b: t.budget, s: t.budgetShape, p: t.pace,
+  });
 }
 
-const CAT_ICON: Record<string, string> = {
-  nature: "park", heritage: "account_balance", food: "restaurant",
-  adventure: "attractions", shopping: "shopping_bag", nightlife: "local_bar",
-  wellness: "spa", religious: "temple_hindu", museum: "museum", photo: "photo_camera",
-};
+function categoryLabel(key: string): string {
+  return CATEGORIES.find((c) => c.key === key)?.label ?? key;
+}
 
-function DayCard({ day }: { day: TripPlan["days"][number] }) {
+// ---------------------------------------------------------------- place card
+function TripPlaceCard({ place, index, color, onDetails }: {
+  place: TripPlanPlace;
+  index: number;
+  color: string;
+  onDetails: () => void;
+}) {
+  const meta = categoryMeta(place.category);
+  const img = photoUrl({ photo_url: place.photo_url });
+  const time = place.suggested_start
+    ? `${place.suggested_start}${place.suggested_end ? ` – ${place.suggested_end}` : ""}`
+    : "";
+
   return (
-    <div className="day-card glass">
-      <div className="day-head">
-        <span className="day-badge">Day {day.day}</span>
-        <span className="muted small">{day.place_count} places • {fmtMins(day.total_activity_min)} sightseeing</span>
+    <article className="tp-place glass">
+      <div className="tp-place-top">
+        <span className="tp-num" style={{ background: color }}>{index + 1}</span>
+        <div className="tp-photo">
+          {img ? (
+            <img src={img} alt={place.name} loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          ) : (
+            <span className="material-symbols-outlined">{meta.icon}</span>
+          )}
+        </div>
+        <div className="tp-main">
+          <div className="tp-time small">
+            {time && <><span className="material-symbols-outlined">schedule</span>{time}</>}
+            <span className="tp-cat" style={{ color: meta.color, background: `${meta.color}18` }}>{meta.label}</span>
+          </div>
+          <h4 className="tp-name">{place.name}</h4>
+          <div className="tp-meta tiny">
+            {place.rating_known && place.rating > 0
+              ? <span className="tp-rating">★ {place.rating.toFixed(1)}{place.review_count ? ` (${place.review_count.toLocaleString()})` : ""}</span>
+              : <span className="muted">Rating not listed</span>}
+            <span>{fmtMins(place.duration_min)}</span>
+            <span>{fmtFee(place)}</span>
+          </div>
+        </div>
       </div>
-      <ol className="day-places">
-        {day.places.map((p, i) => (
-          <li key={p.id} className="day-place">
-            <span className="place-num">{i + 1}</span>
-            <span className="place-cat material-symbols-outlined">{CAT_ICON[p.category] ?? "place"}</span>
-            <span className="place-main">
-              <span className="place-name">{p.name}</span>
-              <span className="muted small">{p.why}</span>
-              <span className="muted tiny">
-                {fmtMins(p.duration_min)} • {p.entry_fee ? `₹${p.entry_fee} entry` : "free entry"}
-                {p.opening_hours ? ` • ${p.opening_hours}` : ""}
-              </span>
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
+      <p className="tp-why tiny">{place.why}</p>
+      <div className="tp-actions row">
+        <button className="tp-link" onClick={onDetails}>
+          <span className="material-symbols-outlined">info</span> Place details
+        </button>
+        {place.place_id && <span className="badge live tiny">LIVE DATA</span>}
+        <span className="muted tiny tp-source">
+          {place.verified ? "Google-verified" : place.data_source === "curated" ? "Curated" : place.data_source}
+        </span>
+      </div>
+    </article>
   );
 }
 
-// ------------------------------------------------------------------ results window (generated itinerary)
+// ---------------------------------------------------------------- day section
+function TripDaySection({ day, groupSize, budget, single }: {
+  day: TripPlanDay;
+  groupSize: number;
+  budget: number;
+  single: boolean;
+}) {
+  const { setTripSelectedPlace } = useApp();
+  const color = dayColor(day.day);
+  const entry = day.places.reduce((s, p) => s + (p.entry_fee_known ? p.entry_fee : 0), 0);
+
+  return (
+    <section className={`tp-day ${single ? "single" : ""}`} style={{ ["--day-color" as string]: color }}>
+      <header className="tp-day-head">
+        <div className="row">
+          <span className="tp-day-dot" />
+          <div>
+            <div className="tp-day-title">Day {day.day}{day.theme ? ` · ${day.theme}` : ""}</div>
+            <div className="muted tiny">
+              {day.start_time && day.end_time ? `${day.start_time} – ${day.end_time} · ` : ""}
+              {day.place_count} stops · {fmtMins(day.total_activity_min)} sightseeing
+              {day.total_distance_km ? ` · ${day.total_distance_km.toFixed(1)} km` : ""}
+            </div>
+          </div>
+        </div>
+        <span className="tp-day-cost tiny">
+          {entry > 0 ? `₹${Math.round(entry * groupSize)} entry` : "no entry fee"}
+        </span>
+      </header>
+
+      <div className="tp-timeline">
+        {day.places.map((place, i) => {
+          const next = day.places[i + 1];
+          return (
+            <div className="tp-stop" key={place.id}>
+              <TripPlaceCard
+                place={place}
+                index={i}
+                color={color}
+                onDetails={() => setTripSelectedPlace(place)}
+              />
+              {next && (
+                <TripHopBlock
+                  day={day.day}
+                  from={place}
+                  to={next}
+                  groupSize={groupSize}
+                  budget={Math.max(200, Math.round(budget / Math.max(1, day.place_count * 2)))}
+                  departAt={place.suggested_end}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------- results window
 export function TripResults() {
-  const { trip } = useApp();
-  const [plan, setPlan] = useState<TripPlan | null>(null);
+  const {
+    trip, setTrip, tripPlan, setTripPlan, tripPlanKey, setTripPlanKey,
+    tripDay, setTripDay, tripTransports, clearTripTransports, setTripSelectedPlace,
+  } = useApp();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tripRef, setTripRef] = useState<TripInputData | null>(null);
 
-  const fetchPlan = useCallback(async (t: TripInputData) => {
-    setLoading(true); setError(null); setTripRef(t);
+  const fetchPlan = useCallback(async (t: TripInputData, force = false) => {
+    const key = requestKey(t);
+    if (!force && tripPlan && tripPlanKey === key) return;
+    setLoading(true);
+    setError(null);
     try {
-      setPlan(await api.tripPlan(requestFromTrip(t)));
+      const plan = await api.tripPlan(requestFromTrip(t));
+      setTripPlan(plan);
+      setTripPlanKey(key);
+      setTripDay(null);
+      // Old hop choices point at places from the previous plan.
+      clearTripTransports();
     } catch (e) {
-      setPlan(null);
       setError(e instanceof Error ? e.message : "Could not generate the trip plan.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [tripPlan, tripPlanKey, setTripPlan, setTripPlanKey, setTripDay, clearTripTransports]);
 
   useEffect(() => {
-    if (trip) fetchPlan(trip);
-  }, [trip, fetchPlan]);
+    if (!trip) return;
+    // Restored plans carry their request key; only regenerate when the input
+    // actually changed (or there is no plan yet).
+    fetchPlan(trip);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip]);
 
-  if (!trip) {
+  const plan = tripPlan;
+  const days = plan?.days ?? [];
+  const visibleDays = useMemo(
+    () => (tripDay == null ? days : days.filter((d) => d.day === tripDay)),
+    [days, tripDay],
+  );
+
+  const groupSize = trip?.groupSize ?? 2;
+  const budget = trip ? (trip.budgetShape === "perPerson" ? trip.budget * trip.groupSize : trip.budget) : 0;
+  const placeCount = days.reduce((s, d) => s + d.place_count, 0);
+  const entryTotal = days.reduce(
+    (s, d) => s + d.places.reduce((x, p) => x + (p.entry_fee_known ? p.entry_fee : 0), 0), 0,
+  );
+  const unknownEntries = days.reduce((s, d) => s + d.places.filter((p) => !p.entry_fee_known).length, 0);
+  const plannedHops = Object.keys(tripTransports).length;
+  const totalHops = days.reduce((s, d) => s + Math.max(0, d.place_count - 1), 0);
+
+  const reset = () => {
+    setTripPlan(null);
+    setTripPlanKey(null);
+    setTripDay(null);
+    setTripSelectedPlace(null);
+    clearTripTransports();
+    setTrip(null);
+  };
+
+  if (!trip && !plan) {
     return (
       <div className="trip-results">
-        <div className="ai-insight glass">
-          <div className="spread">
-            <span className="row"><span className="material-symbols-outlined">auto_awesome</span><b>AI Trip Planner</b></span>
-            <span className="badge live">READY</span>
-          </div>
-          <p className="small mt8">
-            Answer 7 quick steps to build a full day-by-day itinerary with transport, budget and stays.
+        <div className="tp-empty-hero glass">
+          <span className="tp-empty-icon material-symbols-outlined">luggage</span>
+          <h3>Build a Bengaluru trip that actually makes sense</h3>
+          <p className="small muted">
+            Pick your interests and pace. We group nearby places into days, order them by the
+            best time to visit, and let you plan every hop — metro, bus, cab or walk.
           </p>
-        </div>
-        <div className="section-head mt12">Generated Plan</div>
-        <div className="empty glass">
-          <span className="material-symbols-outlined">luggage</span>
-          <div className="muted small">Nothing yet. Fill the form and hit "Generate My Trip".</div>
+          <div className="row wrap gap">
+            {["Day-by-day map", "Real ratings & photos", "Hop-by-hop transit", "Cab & fuel costs"].map((f) => (
+              <span className="chip" key={f}>{f}</span>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
-  const planIsForThisTrip = tripRef === trip;
+  const destination = trip?.destination?.name ?? BENGALURU.name;
 
   return (
     <div className="trip-results">
-      <div className="trip-preview-card glass anim-in">
-        <div className="spread">
-          <span className="row"><span className="material-symbols-outlined">check_circle</span><b>Your plan</b></span>
-          <span className="badge live">{planIsForThisTrip && plan ? "GENERATED" : "LOCKED"}</span>
+      <div className="tp-hero anim-in">
+        <div className="tp-hero-bg" />
+        <div className="tp-hero-top row spread">
+          <span className="row tp-hero-place">
+            <span className="material-symbols-outlined">location_city</span>
+            <span>
+              <span className="tiny tp-hero-kicker">BENGALURU ITINERARY</span>
+              <b>{destination}</b>
+            </span>
+          </span>
+          <span className="row gap">
+            <button className="tp-icon-btn" title="Regenerate plan" onClick={() => trip && fetchPlan(trip, true)} disabled={loading}>
+              <span className={`material-symbols-outlined ${loading ? "spin" : ""}`}>refresh</span>
+            </button>
+            <button className="tp-icon-btn" title="Clear plan" onClick={reset}>
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </span>
         </div>
-        <div className="muted small mt8">{trip.destination?.name ?? "Suggested destination"}</div>
-        <div className="spread mt8">
-          <b>{trip.days} day{trip.days === 1 ? "" : "s"}</b>
-          <span className="muted small">{trip.groupSize} traveller{trip.groupSize === 1 ? "" : "s"} • {trip.pace} pace</span>
+
+        <div className="tp-hero-stats">
+          <div><b>{plan?.total_places ?? placeCount}</b><span>places</span></div>
+          <div><b>{days.length}</b><span>days</span></div>
+          <div><b>{plan?.total_distance_km ? plan.total_distance_km.toFixed(0) : "—"}</b><span>km between stops</span></div>
+          <div><b>{fmtMins(plan?.total_activity_min ?? 0)}</b><span>sightseeing</span></div>
         </div>
-        <div className="muted small mt8">Budget ₹{trip.budget.toLocaleString()} {trip.budgetShape === "perPerson" ? "per person" : "total"}</div>
-        {trip.interests.length > 0 && (
-          <div className="row mt8 wrap">
-            {trip.interests.map((i) => <span key={i} className="chip">{i}</span>)}
+
+        <div className="row wrap gap mt8">
+          {(trip?.categories ?? plan?.categories ?? []).map((c) => (
+            <span className="tp-hero-chip" key={c}>{categoryLabel(c)}</span>
+          ))}
+          <span className="tp-hero-chip">{groupSize} traveller{groupSize === 1 ? "" : "s"}</span>
+          {budget > 0 && <span className="tp-hero-chip">₹{budget.toLocaleString()} budget</span>}
+          {entryTotal > 0 && <span className="tp-hero-chip">₹{Math.round(entryTotal * groupSize)} entry est.</span>}
+          {unknownEntries > 0 && <span className="tp-hero-chip warn">{unknownEntries} fees unlisted</span>}
+        </div>
+
+        {totalHops > 0 && (
+          <div className="tp-hop-progress small">
+            <span className="material-symbols-outlined">route</span>
+            {plannedHops} of {totalHops} hops planned
+            <span className="tp-progress-track"><span style={{ width: `${Math.round((plannedHops / totalHops) * 100)}%` }} /></span>
           </div>
         )}
       </div>
 
       {loading && (
-        <div className="empty glass">
-          <span className="material-symbols-outlined spin">progress_activity</span>
-          <div className="muted small">Building your day-by-day itinerary…</div>
+        <div className="tp-loading glass">
+          <span className="spinner inline" />
+          <span className="small">Building your Bengaluru days…</span>
         </div>
       )}
 
@@ -268,29 +378,66 @@ export function TripResults() {
         </div>
       )}
 
-      {!loading && !error && plan && (
+      {!loading && !error && plan && days.length === 0 && (
+        <div className="empty glass warn">
+          <span className="material-symbols-outlined">info</span>
+          <div className="small">{plan.warning ?? "No places matched those filters. Try widening your categories."}</div>
+        </div>
+      )}
+
+      {!loading && plan && days.length > 0 && (
         <>
-          <div className="section-head mt12">Day-wise Plan</div>
-          {plan.warning && (
-            <div className="empty glass warn">
-              <span className="material-symbols-outlined">info</span>
-              <div className="small">{plan.warning}</div>
-            </div>
-          )}
-          {plan.days.map((d) => <DayCard key={d.day} day={d} />)}
+          <div className="tp-day-tabs" role="tablist">
+            <button
+              className={`tp-day-tab ${tripDay == null ? "active" : ""}`}
+              onClick={() => setTripDay(null)}
+              role="tab"
+              aria-selected={tripDay == null}
+            >
+              <span className="material-symbols-outlined">map</span> Full trip
+            </button>
+            {days.map((d) => (
+              <button
+                key={d.day}
+                className={`tp-day-tab ${tripDay === d.day ? "active" : ""}`}
+                onClick={() => setTripDay(d.day)}
+                role="tab"
+                aria-selected={tripDay === d.day}
+                style={{ ["--day-color" as string]: dayColor(d.day) }}
+              >
+                <span className="tp-tab-dot" /> Day {d.day}
+              </button>
+            ))}
+          </div>
+
+          <div className="tp-days">
+            {visibleDays.map((d) => (
+              <TripDaySection
+                key={d.day}
+                day={d}
+                groupSize={groupSize}
+                budget={budget}
+                single={tripDay != null}
+              />
+            ))}
+          </div>
+
           <div className="disclaimer small mt8">
             <span className="material-symbols-outlined">verified</span>
             {plan.disclaimer}
-            {plan.relaxed && " • Interest filter was thin, so nearby options were included."}
+            {plan.relaxed && " Your category filter was thin, so nearby options were included."}
           </div>
-          <div className="muted tiny">Transport, budget and stays come next. Order is optimized to avoid backtracking.</div>
+          <div className="muted tiny tp-footnote">
+            Times are suggested from opening windows and straight-line travel — open a leg to fetch
+            real transit, cab and walking options. Nothing on this page is a live ETA unless badged LIVE.
+          </div>
         </>
       )}
     </div>
   );
 }
 
-// ------------------------------------------------------------------ input window (7-step wizard)
+// ---------------------------------------------------------------- wizard
 export default function TripInput() {
   const { setTrip } = useApp();
   const [draft, setDraft] = useState<TripInputData>({ ...DEFAULT_DRAFT, budgetSplits: { ...AUTO_SPLITS } });
@@ -303,27 +450,30 @@ export default function TripInput() {
 
   const canNext = useMemo(() => {
     switch (step) {
-      case 0: return draft.suggestDestination || !!draft.destination || draft.destination === null;
+      case 0: return true;
       case 1: return draft.durationMode === "days" ? draft.days >= 1 : daysCount >= 1;
       case 2: return draft.groupSize >= 1;
       case 3: return draft.budget > 0;
-      case 4: return draft.interests.length > 0;
+      case 4: return draft.categories.length > 0;
       case 5: return true;
       default: return true;
     }
   }, [step, draft, daysCount]);
 
-  // Step 0 always passable (optional destination) so user can rely on "suggest" + interests.
+  const toggleCategory = (key: string) => {
+    set({ categories: draft.categories.includes(key)
+      ? draft.categories.filter((c) => c !== key)
+      : [...draft.categories, key] });
+  };
+
   const generate = () => {
-    const final = { ...draft, days: daysCount > 0 ? daysCount : draft.days };
-    setTrip(final);
+    setTrip({ ...draft, destination: BENGALURU, days: daysCount > 0 ? daysCount : draft.days });
   };
 
   const goEdit = (s: number) => setStep(s);
 
   return (
     <div className="trip-wizard">
-      {/* stepper */}
       <div className="trip-steps row">
         {STEP_TITLES.map((t, i) => (
           <button
@@ -338,18 +488,23 @@ export default function TripInput() {
       </div>
       <div className="step-title">{STEP_TITLES[step]}</div>
 
-      {/* STEP 1 Destination */}
       {step === 0 && (
         <div className="step-body">
-          <DestinationInput value={draft.destination} onPick={(p) => set({ destination: p })} />
-          <label className="check-row">
-            <input type="checkbox" checked={draft.suggestDestination} onChange={(e) => set({ suggestDestination: e.target.checked })} />
-            <span>Suggest a destination for me (fit to climate, distance, themes)</span>
-          </label>
+          <div className="tp-city-card">
+            <span className="material-symbols-outlined">location_city</span>
+            <span>
+              <b>Bengaluru</b>
+              <div className="muted small">Garden city · heritage, food streets, markets, parks</div>
+            </span>
+            <span className="badge live">68 PLACES</span>
+          </div>
+          <div className="muted tiny">
+            Bengaluru is the only city with a full place pool right now. More cities can plug into
+            the same dataset later.
+          </div>
         </div>
       )}
 
-      {/* STEP 2 Duration */}
       {step === 1 && (
         <div className="step-body">
           <div className="mode-tabs row">
@@ -377,7 +532,6 @@ export default function TripInput() {
         </div>
       )}
 
-      {/* STEP 3 Group */}
       {step === 2 && (
         <div className="step-body">
           <div className="group-chips row wrap">
@@ -398,7 +552,6 @@ export default function TripInput() {
         </div>
       )}
 
-      {/* STEP 4 Budget */}
       {step === 3 && (
         <div className="step-body">
           <div className="mode-tabs row">
@@ -426,21 +579,25 @@ export default function TripInput() {
         </div>
       )}
 
-      {/* STEP 5 Interests */}
       {step === 4 && (
         <div className="step-body">
-          <div className="group-chips row wrap">
-            {INTERESTS.map((i) => (
-              <button key={i} className={`chip ${draft.interests.includes(i) ? "active" : ""}`}
-                onClick={() => set({ interests: draft.interests.includes(i) ? draft.interests.filter((x) => x !== i) : [...draft.interests, i] })}>
-                {i}
+          <div className="muted small">Pick the kinds of places you want. The planner mixes them across days.</div>
+          <div className="tp-cat-grid">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.key}
+                className={`tp-cat-chip ${draft.categories.includes(c.key) ? "active" : ""}`}
+                onClick={() => toggleCategory(c.key)}
+              >
+                <span className="material-symbols-outlined">{c.icon}</span>
+                <span>{c.label}</span>
+                {draft.categories.includes(c.key) && <span className="material-symbols-outlined check">check_circle</span>}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* STEP 6 Pace */}
       {step === 5 && (
         <div className="step-body">
           <div className="pace-list">
@@ -454,20 +611,18 @@ export default function TripInput() {
         </div>
       )}
 
-      {/* STEP 7 Summary */}
       {step === 6 && (
         <div className="step-body">
-          <SummaryRow label="Destination" icon="location_on" onEdit={() => goEdit(0)}
-            value={draft.suggestDestination ? "Auto-suggest (fit to climate/themes)" : (draft.destination?.name ?? "Not set")} />
+          <SummaryRow label="Destination" icon="location_city" onEdit={() => goEdit(0)} value="Bengaluru" />
           <SummaryRow label="Duration" icon="calendar_month" onEdit={() => goEdit(1)}
             value={daysCount > 0 ? `${daysCount} day${daysCount === 1 ? "" : "s"}` : `${draft.days} day${draft.days === 1 ? "" : "s"}`}
             hint={draft.durationMode === "dates" && draft.startDate ? `${draft.startDate} → ${draft.endDate ?? "…"}` : undefined} />
           <SummaryRow label="Group" icon="groups" onEdit={() => goEdit(2)}
             value={`${draft.groupSize} traveller${draft.groupSize === 1 ? "" : "s"} • ${GROUP_TYPES.find((g) => g.key === draft.groupType)?.label}${draft.hasKids ? " • with kids" : ""}`} />
           <SummaryRow label="Budget" icon="account_balance_wallet" onEdit={() => goEdit(3)}
-            value={`₹${draft.budget.toLocaleString()} ${draft.budgetShape === "perPerson" ? "per person" : "total"} • ${JSON.stringify(draft.budgetSplits) !== JSON.stringify(AUTO_SPLITS) ? "custom split" : "auto split"}`} />
-          <SummaryRow label="Interests" icon="favorite" onEdit={() => goEdit(4)}
-            value={draft.interests.length ? draft.interests.join(" · ") : "None selected"} />
+            value={`₹${draft.budget.toLocaleString()} ${draft.budgetShape === "perPerson" ? "per person" : "total"}`} />
+          <SummaryRow label="Categories" icon="favorite" onEdit={() => goEdit(4)}
+            value={draft.categories.length ? draft.categories.map(categoryLabel).join(" · ") : "None selected"} />
           <SummaryRow label="Pace" icon="balance" onEdit={() => goEdit(5)}
             value={PACES.find((p) => p.key === draft.pace)?.label ?? draft.pace} />
         </div>

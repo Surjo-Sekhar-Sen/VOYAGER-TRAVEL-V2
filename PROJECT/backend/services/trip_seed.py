@@ -35,7 +35,13 @@ def _place(
         weekly_closures=weekly_closures or [], family_friendly=family_friendly,
         physically_demanding=physically_demanding,
         accessibility_notes=accessibility_notes,
-        destination="bengaluru", data_source="static", data_is_estimated=True,
+        destination="bengaluru", data_source="curated", data_is_estimated=True,
+        verified=True,
+        suitability={
+            "family_kids": family_friendly,
+            "seniors": not physically_demanding,
+            "physical_demand": physically_demanding,
+        },
     )
 
 

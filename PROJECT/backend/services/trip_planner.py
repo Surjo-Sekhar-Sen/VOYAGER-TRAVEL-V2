@@ -17,8 +17,9 @@ ESTIMATED, never fabricated (golden rule #1). A live API can swap in later
 behind the same `TripPlace` shape.
 """
 import logging
+import math
 
-from . import trip_seed
+from . import trip_places, trip_seed
 from .data_schema import GROUP_TYPES, GroupType, INTEREST_TAGS, RankedPlace
 
 logger = logging.getLogger(__name__)
@@ -26,11 +27,46 @@ logger = logging.getLogger(__name__)
 _EPS = 1e-9
 _CROWD_VALUE = {"low": 1.0, "medium": 0.6, "high": 0.2, "unknown": 0.5}
 _PACE_PER_DAY = {"relaxed": 2, "balanced": 4, "packed": 6}
+# Rating confidence: a 4.8 with 80 ratings should not beat a 4.6 with 180k.
+_RATING_PRIOR_COUNT = 300.0
+_RATING_PRIOR_MEAN = 4.0
+
+# Time-of-day scheduling (Phase C). A day is ordered by when a place is best
+# visited, not just by distance: sunrise spots first, museums/markets in the
+# afternoon, food at meals, nightlife last.
+_SLOT_ORDER = {"early_morning": 0, "morning": 1, "afternoon": 2, "evening": 3, "night": 4}
+_SLOT_START_MIN = {"early_morning": 7 * 60, "morning": 9 * 60,
+                   "afternoon": 13 * 60, "evening": 17 * 60, "night": 20 * 60}
+_CATEGORY_SLOT = {
+    "nature": "early_morning", "photo": "morning", "wellness": "morning",
+    "heritage": "morning", "museum": "morning", "religious": "morning",
+    "adventure": "morning", "offbeat": "morning",
+    "shopping": "afternoon", "food": "afternoon",
+    "nightlife": "evening",
+}
+_MEAL_GAP_MIN = 20  # coffee/washroom buffer between two places
+# Day plans stay inside the city so a "Bengaluru trip" is not four 40 km hops.
+# Far getaways (Nandi Hills, Devanahalli) remain in the discovery pool, and the
+# planner widens this automatically if too few city places are available.
+_PLAN_RADIUS_KM = 16.0
+# How many stops of each kind a mixed itinerary should carry. Without this a
+# round-robin can return two malls and two breweries but no park.
+_CATEGORY_CAP = {
+    "food": 2, "shopping": 1, "nightlife": 1, "wellness": 1,
+    "adventure": 1, "museum": 2, "heritage": 2, "nature": 2,
+    "religious": 2, "photo": 1, "offbeat": 1,
+}
+_CATEGORY_LABELS = {
+    "nature": "nature", "heritage": "heritage", "food": "food",
+    "shopping": "shopping", "nightlife": "nightlife", "adventure": "adventure",
+    "wellness": "wellness", "religious": "temples", "museum": "museums",
+    "photo": "photo spots", "offbeat": "offbeat spots",
+}
 
 
 class TripPlannerService:
     def destinations(self) -> list[dict]:
-        return trip_seed.destinations()
+        return trip_places.destinations()
 
     def discover_places(
         self,
@@ -39,37 +75,59 @@ class TripPlannerService:
         group_type: str = "friends",
         limit: int = 12,
         budget: float | None = None,
+        categories: list[str] | None = None,
     ) -> dict:
-        """Rank the destination pool for the given interests + group type.
+        """Rank the destination pool for the given interests + categories.
 
         Returns the top `limit` places (diversity-capped) with per-place score,
         component breakdown and a human `why` line, plus a disclaimer flag and
-        an optional `relaxed` note when interests had to be widened.
+        an optional `relaxed` note when interests/categories had to be widened.
         """
         interests = _normalize_interests(interests)
-        pool = trip_seed.places_for_destination(destination)
+        categories = _normalize_categories(categories)
+        pool = trip_places.places_for_destination(destination)
         group_type = group_type if group_type in GROUP_TYPES else "friends"
 
-        ranked = [self._rank(p, interests, group_type) for p in pool]
-        ranked.sort(key=lambda rp: (-rp.score, -rp.rating, rp.review_count))
+        category_relaxed = False
+        if categories:
+            # Filter on the place's primary category so the chips in the UI do
+            # what they say: "Temples" means temples, not every heritage-tagged
+            # statue. Tags remain available for interest scoring.
+            filtered = [p for p in pool if p.category in categories]
+            if len(filtered) >= 3:
+                pool = filtered
+            else:
+                category_relaxed = True
 
-        relaxed = _should_relax(ranked, interests)
-        if relaxed:
+        ranked = [self._rank(p, interests, group_type) for p in pool]
+        # Most-reviewed first on ties: a 4.6 park with 180k ratings is a safer
+        # recommendation than a 4.6 lane with 40 ratings.
+        ranked.sort(key=lambda rp: (-rp.score, -rp.rating, -rp.review_count))
+
+        relaxed = category_relaxed or _should_relax(ranked, interests)
+        if relaxed and not category_relaxed:
             ranked = _rank_ignoring_interest(ranked)
-            ranked.sort(key=lambda rp: (-rp.score, -rp.rating, rp.review_count))
+            ranked.sort(key=lambda rp: (-rp.score, -rp.rating, -rp.review_count))
 
         pool_limit = max(3, limit)
+        # A category-filtered pool is intentionally narrow: do not let the 40%
+        # diversity cap erase it down to a couple of token entries.
+        narrow_pool = bool(categories) and len(pool) <= pool_limit
         selected = _enforce_diversity(
-            ranked, pool_limit, narrow=len(interests) == 1 and "food" in interests)
+            ranked, pool_limit,
+            narrow=narrow_pool or (len(interests) == 1 and "food" in interests))
         _assign_ranks(selected)
 
         return {
             "destination": destination,
             "group_type": group_type,
             "interests": interests,
+            "categories": categories,
+            "data_source": trip_places.source_label(),
             "disclaimer": (
-                "Static seed data — fees, timings, ratings and crowd are "
-                "approximate. Please verify details with the venue before your trip."
+                "Place data is a mix of curated and OpenStreetMap entries — fees, "
+                "timings, ratings and crowd are approximate unless marked live. "
+                "Please verify details with the venue before your trip."
             ),
             "relaxed": relaxed,
             "places": [p.model_dump(mode="json") for p in selected],
@@ -83,6 +141,7 @@ class TripPlannerService:
         days: int = 3,
         pace: str = "balanced",
         budget: float | None = None,
+        categories: list[str] | None = None,
     ) -> dict:
         """Day-wise itinerary for a destination (Phase 3 of the build).
 
@@ -92,39 +151,64 @@ class TripPlannerService:
         backtracking. Transport (Phase 4) + budget (Phase 5) slot in later —
         this endpoint returns place order + activity time only.
         """
+        # Pull the full ranked pool (not just the diversity-capped discover
+        # window) so an iconic-but-crowded landmark is still available to the
+        # itinerary picker.
         res = self.discover_places(
-            destination, interests, group_type, limit=40, budget=budget)
+            destination, interests, group_type, limit=100, budget=budget,
+            categories=categories)
         ranked = res["places"]
         interests = res["interests"]
         pace = pace if pace in _PACE_PER_DAY else "balanced"
         k = max(1, int(days))
 
+        # Keep the day plan city-scale. Distances are real great-circle km from
+        # the destination centre, not a guess; if the filter would leave too
+        # little to work with we fall back to the unfiltered pool.
+        center = _destination_center(destination)
+        if center:
+            city = [p for p in ranked
+                    if _haversine_km(center[0], center[1], p["lat"], p["lng"]) <= _PLAN_RADIUS_KM]
+            if len(city) >= max(6, k * 2):
+                ranked = city
+
         if not ranked:
             return {
                 "destination": destination, "group_type": group_type,
-                "interests": interests, "pace": pace, "days": [],
+                "interests": interests, "categories": res["categories"],
+                "pace": pace, "days": [],
                 "total_places": 0, "disclaimer": res["disclaimer"],
                 "relaxed": res["relaxed"],
                 "warning": (
                     f"No places available yet for '{destination}'. Only Bengaluru "
-                    "is seeded in Phase 2."
+                    "is populated."
                 ),
             }
 
         per_day = _PACE_PER_DAY[pace]
         max_total = max(3, per_day * k)
-        selected = ranked[:max_total]
+        # A plain "top N by score" itinerary becomes a wall of the highest-rated
+        # temples. Pick round-robin across categories so every day mixes a
+        # landmark, a green space, food and a museum where the pool allows it.
+        selected = _balanced_pick(ranked, max_total, narrow=bool(categories))
         if k > len(selected):
             k = len(selected)
 
         clusters = _balanced_clusters(selected, k)
         days_out: list[dict] = []
         for i, cluster in enumerate(clusters, start=1):
-            ordered = _order_nearest_neighbour(cluster)
+            ordered = _schedule_day(cluster)
+            distance = sum(
+                _h(nxt, prev) for prev, nxt in zip(ordered, ordered[1:])
+            )
             days_out.append({
                 "day": i,
+                "theme": _day_theme(ordered),
                 "place_count": len(ordered),
                 "total_activity_min": sum(p["duration_min"] for p in ordered),
+                "total_distance_km": round(distance, 2),
+                "start_time": ordered[0]["suggested_start"] if ordered else "",
+                "end_time": ordered[-1]["suggested_end"] if ordered else "",
                 "places": ordered,
             })
 
@@ -132,9 +216,13 @@ class TripPlannerService:
             "destination": destination,
             "group_type": group_type,
             "interests": interests,
+            "categories": res["categories"],
+            "data_source": res["data_source"],
             "pace": pace,
             "days": days_out,
             "total_places": len(selected),
+            "total_activity_min": sum(d["total_activity_min"] for d in days_out),
+            "total_distance_km": round(sum(d["total_distance_km"] for d in days_out), 2),
             "disclaimer": res["disclaimer"],
             "relaxed": res["relaxed"],
         }
@@ -143,7 +231,11 @@ class TripPlannerService:
     @staticmethod
     def _rank(p, interests: list[str], group_type: str) -> RankedPlace:
         interest_match = _interest_match(p, interests)
-        rating_norm = max(0.0, min(1.0, p.rating / 5.0))
+        rating_norm = (
+            max(0.0, min(1.0, _bayesian_rating(p.rating, p.review_count) / 5.0))
+            if getattr(p, "rating_known", True) and p.rating > 0
+            else 0.5  # unknown rating -> neutral, never a confident guess
+        )
         group_fit = _group_fit(p, group_type)
         crowd = _crowd_penalty_inverse(p)
         uniqueness = _uniqueness_bonus(p, interests)
@@ -170,6 +262,16 @@ class TripPlannerService:
 
 
 # --------------------------------------------------------------- sub-scores
+def _bayesian_rating(rating: float, count: int) -> float:
+    """Rating pulled toward the city mean when the review count is small.
+
+    This keeps a handful of 5-star reviews from outranking Bengaluru's
+    well-established landmarks. The raw rating is still what the UI shows.
+    """
+    count = max(0, int(count or 0))
+    return (rating * count + _RATING_PRIOR_MEAN * _RATING_PRIOR_COUNT) / (count + _RATING_PRIOR_COUNT)
+
+
 def _interest_match(p, interests: list[str]) -> float:
     if not interests:
         return 0.5  # no interests chosen -> neutral
@@ -218,7 +320,7 @@ def _why_line(p, interests, group_type, interest_match, group_fit, crowd) -> str
     matched = sorted(set(p.tags) & set(interests))
     if matched:
         parts.append("matches your " + _pretty_list(matched))
-    if p.rating >= 4.3:
+    if getattr(p, "rating_known", True) and p.rating >= 4.3:
         parts.append(f"highly rated ({p.rating:.1f})")
     if p.category == "nightlife" and group_type in ("solo", "couple", "friends"):
         parts.append("nightlife pick")
@@ -249,6 +351,17 @@ def _normalize_interests(interests: list[str] | None) -> list[str]:
         i = i.strip().lower().replace(" ", "_").replace("-", "_")
         if i and i not in seen and i in INTEREST_TAGS:
             seen.append(i)
+    return seen
+
+
+def _normalize_categories(categories: list[str] | None) -> list[str]:
+    if not categories:
+        return []
+    seen: list[str] = []
+    for c in categories:
+        c = c.strip().lower().replace(" ", "_").replace("-", "_")
+        if c and c not in seen and c in INTEREST_TAGS:
+            seen.append(c)
     return seen
 
 
@@ -380,11 +493,62 @@ def _greedy_chain(points: list[dict]) -> list[dict]:
 def _balanced_clusters(points: list[dict], k: int) -> list[list[dict]]:
     """Spatially-coherent + size-balanced day clusters (3.1).
 
-    Builds one greedy nearest-neighbour chain across all places (so consecutive
-    places are near each other), then slices the chain into `k` contiguous,
-    near-equal chunks. Nearby places land in the same day and no day is
-    overloaded — avoids the city-centre-vs-outlier imbalance of raw k-means.
+    k-means keeps each day geographically tight; a balancing pass then moves
+    points out of over-full clusters so every day gets a usable number of
+    stops. Slicing one greedy chain (the old approach) could put a south-west
+    wellness retreat and a north grassland in the same day.
     """
+    n = len(points)
+    if k >= n:
+        return [[p] for p in points]
+    clusters = _kmeans(points, k)
+    if not clusters:
+        return _balanced_clusters_from_chain(points, k)
+    return _balance_sizes(clusters, k, n)
+
+
+def _balance_sizes(clusters: list[list[dict]], k: int, n: int) -> list[list[dict]]:
+    """Move points out of oversized clusters into the nearest cluster with room.
+
+    k-means clustering is geographically sensible but can be very uneven; a day
+    with 7 stops and a day with 1 is not a usable itinerary.
+    """
+    if not clusters:
+        return clusters
+    cap = -(-n // k)  # ceil
+    clusters = [list(c) for c in clusters]
+    while len(clusters) < k:
+        clusters.append([])
+
+    def centroid(c: list[dict]) -> tuple[float, float]:
+        return (sum(p["lat"] for p in c) / len(c),
+                sum(p["lng"] for p in c) / len(c))
+
+    for _ in range(n * 2):
+        over = [i for i, c in enumerate(clusters) if len(c) > cap]
+        if not over:
+            break
+        moved = False
+        for i in over:
+            cents = [centroid(c) if c else (0.0, 0.0) for c in clusters]
+            src = clusters[i]
+            src_cent = centroid(src)
+            src.sort(key=lambda p: -_hd((p["lat"], p["lng"]), src_cent))
+            point = src[0]
+            targets = [j for j, c in enumerate(clusters) if j != i and len(c) < cap]
+            if not targets:
+                continue
+            j = min(targets, key=lambda t: _hd((point["lat"], point["lng"]), cents[t]))
+            src.remove(point)
+            clusters[j].append(point)
+            moved = True
+        if not moved:
+            break
+    return [c for c in clusters if c]
+
+
+def _balanced_clusters_from_chain(points: list[dict], k: int) -> list[list[dict]]:
+    """Fallback: slice a nearest-neighbour chain into `k` chunks."""
     chain = _greedy_chain(points)
     n = len(chain)
     if k >= n:
@@ -398,6 +562,167 @@ def _balanced_clusters(points: list[dict], k: int) -> list[list[dict]]:
         clusters.append(chain[idx:idx + sz])
         idx += sz
     return clusters
+
+
+def _balanced_pick(ranked: list, limit: int, narrow: bool = False) -> list:
+    """Round-robin across categories, best-scoring category first.
+
+    Keeps the ranking formula intact while stopping a single category (usually
+    temples) from filling the whole trip. Once every category has one entry the
+    cycle continues with the next-best place per category. Works on the
+    serialised dicts returned by `discover_places`.
+    """
+    buckets: dict[str, list] = {}
+    for rp in ranked:
+        cat = rp["category"] if isinstance(rp, dict) else rp.category
+        buckets.setdefault(cat, []).append(rp)
+
+    def sort_key(item):
+        # Landmark prominence within a category: a well-reviewed 4.4 is a safer
+        # holiday pick than a barely-reviewed 4.6. The spec score still breaks
+        # ties and is what the result card shows.
+        if isinstance(item, dict):
+            rating, count, score = item["rating"], item["review_count"], item["score"]
+        else:
+            rating, count, score = item.rating, item.review_count, item.score
+        prominence = rating * math.log10(1 + max(0, count))
+        return (-prominence, -score, -rating)
+
+    def score_of(item):
+        return item["score"] if isinstance(item, dict) else item.score
+
+    for items in buckets.values():
+        items.sort(key=sort_key)
+    order = sorted(buckets, key=lambda c: (-score_of(buckets[c][0]), c))
+    picked: list = []
+    per_category: dict[str, int] = {}
+
+    def cap_for(cat: str) -> int:
+        if narrow:
+            return limit
+        return _CATEGORY_CAP.get(cat, 2)
+
+    idx = 0
+    while len(picked) < limit:
+        if not any(buckets[c] and per_category.get(c, 0) < cap_for(c) for c in order):
+            break
+        cat = order[idx % len(order)]
+        if buckets[cat] and per_category.get(cat, 0) < cap_for(cat):
+            picked.append(buckets[cat].pop(0))
+            per_category[cat] = per_category.get(cat, 0) + 1
+        idx += 1
+    return picked
+
+
+def _destination_center(slug: str) -> tuple[float, float] | None:
+    for dest in trip_seed.destinations():
+        if dest.get("slug") == slug:
+            try:
+                return float(dest["lat"]), float(dest["lng"])
+            except (KeyError, TypeError, ValueError):
+                return None
+    return None
+
+
+def _h(a: dict, b: dict) -> float:
+    return _haversine_km(a["lat"], a["lng"], b["lat"], b["lng"])
+
+
+def _slot_for(p: dict, food_index: int, food_only: bool = False) -> str:
+    """Best time-of-day window for a place; meals are pinned to meal times."""
+    category = p.get("category", "")
+    available = [s for s in (p.get("best_times") or []) if s in _SLOT_ORDER]
+    if category == "food":
+        if food_only:
+            # food crawl: breakfast, lunch, snack, dinner
+            pattern = ["morning", "afternoon", "evening", "night"]
+            desired = pattern[food_index % len(pattern)]
+        else:
+            desired = "afternoon" if food_index == 0 else "night"
+        if not available or desired in available:
+            return desired
+        # keep the venue's own stated window when the ideal slot is unavailable
+        return min(available, key=lambda s: abs(_SLOT_ORDER.get(s, 9) - _SLOT_ORDER.get(desired, 9)))
+    default = _CATEGORY_SLOT.get(category, "morning")
+    if not available or default in available:
+        return default
+    return min(available, key=lambda s: _SLOT_ORDER.get(s, 9))
+
+
+def _fmt_minutes(minutes: int) -> str:
+    minutes = max(0, min(23 * 60 + 59, int(minutes)))
+    return f"{minutes // 60:02d}:{minutes % 60:02d}"
+
+
+def _schedule_day(points: list[dict]) -> list[dict]:
+    """Order a day by time-of-day, then nearest-neighbour inside each window.
+
+    Adds a suggested clock time to every place plus the straight-line distance
+    from the previous stop. The clock times are schedule suggestions (the
+    per-hop travel itself is fetched on demand by the UI), so the frontend
+    labels them "suggested", never as a live ETA.
+    """
+    if not points:
+        return []
+
+    food_only = bool(points) and all(p.get("category") == "food" for p in points)
+    slots: dict[str, str] = {}
+    food_seen = 0
+    for p in points:
+        slots[p["id"]] = _slot_for(p, food_seen, food_only)
+        if p.get("category") == "food":
+            food_seen += 1
+
+    buckets: dict[str, list[dict]] = {}
+    for p in points:
+        buckets.setdefault(slots[p["id"]], []).append(p)
+
+    chain: list[dict] = []
+    for slot in sorted(buckets, key=lambda s: _SLOT_ORDER.get(s, 9)):
+        chain.extend(_order_nearest_neighbour(buckets[slot]))
+
+    first_slot = slots[chain[0]["id"]]
+    cursor = _SLOT_START_MIN.get(first_slot, 9 * 60)
+    out: list[dict] = []
+    prev: dict | None = None
+    for place in chain:
+        slot = slots[place["id"]]
+        travel_km = round(_h(prev, place), 2) if prev else 0.0
+        travel_min = max(10, round(travel_km * 3.0)) if prev else 0
+        arrival = max(cursor + travel_min, _SLOT_START_MIN.get(slot, 9 * 60))
+        if place.get("category") == "food":
+            meal_floor = {
+                "morning": 8 * 60 + 30,
+                "afternoon": 12 * 60 + 30,
+                "evening": 17 * 60,
+                "night": 19 * 60 + 30,
+            }.get(slot, 12 * 60 + 30)
+            arrival = max(arrival, meal_floor)
+        end = arrival + max(20, int(place.get("duration_min") or 60))
+        item = dict(place)
+        item.update({
+            "slot": slot,
+            "suggested_start": _fmt_minutes(arrival),
+            "suggested_end": _fmt_minutes(end),
+            "travel_from_prev_km": travel_km,
+        })
+        out.append(item)
+        cursor = end + _MEAL_GAP_MIN
+        prev = place
+    return out
+
+
+def _day_theme(points: list[dict]) -> str:
+    counts: dict[str, int] = {}
+    for p in points:
+        counts[p.get("category", "")] = counts.get(p.get("category", ""), 0) + 1
+    top = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:2]
+    labels = [_CATEGORY_LABELS.get(cat, cat.replace("_", " ")) for cat, _ in top if cat]
+    if not labels:
+        return "Mixed day"
+    if len(labels) == 1:
+        return labels[0].capitalize() + " day"
+    return labels[0].capitalize() + " & " + labels[1]
 
 
 def _order_nearest_neighbour(points: list[dict]) -> list[dict]:

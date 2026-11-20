@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { HopOption, LatLng, Segment } from "../types";
+import type { HopOption, LatLng, Segment, StopRef } from "../types";
 import "./HopTreeView.css";
 
 export const MODE_META: Record<string, { icon: string; color: string; label: string }> = {
@@ -171,9 +171,10 @@ function buildTree(
     nodes.push(n);
     return n;
   };
-  const edgeLabel = (opt: HopOption) =>
-    opt.mode === "walk" ? "walk"
-      : opt.routeNumber ?? MODE_META[opt.mode ?? ""]?.label ?? opt.mode ?? "";
+  const edgeLabel = (opt: HopOption) => {
+    if (opt.mode === "walk") return opt.isFinalWalk ? "walk to dest" : "walk";
+    return opt.routeNumber ?? MODE_META[opt.mode ?? ""]?.label ?? opt.mode ?? "";
+  };
 
   const kmRoot = havKm(source ?? undefined, dest);
 
@@ -181,38 +182,49 @@ function buildTree(
   const root = mk(0, LEFT_PAD, RAIL_Y, source?.name ?? "Source", "source",
     kmRoot != null ? `→ ${kmRoot.toFixed(1)} km to dest` : null, undefined, true);
 
-  // BUG2: a transit first hop implies walking to its boarding point first. Show
-  // that access walk as a real node unless it is trivial (<50 m). The walk is
-  // display-only here — `confirmed` stays the chained leg list the backend
-  // time-chains on, so indices for alternatives are shifted below accordingly.
-  const access = confirmed[0]?.accessWalk;
-  const hasAccessWalk = confirmed.length > 0 &&
-    confirmed[0].mode !== "walk" &&
-    !!access &&
-    (access.distanceKm ?? 0) >= 0.05;
-  const shift = hasAccessWalk ? 1 : 0;
-
+  // Each transit leg implies a WALK to its boarding stop. That walk used to be
+  // drawn only for the very first leg, so "bus -> walk to the next stop -> bus"
+  // (the transfer every real journey includes) was invisible. Every leg now
+  // contributes its own walk column, labelled as a transfer when it starts where
+  // the previous leg ended. Trivial walks (<50 m) stay hidden.
+  // The walks are display-only: `confirmed` remains the chained leg list the
+  // backend time-chains on, so each leg keeps its own true level index.
+  const MIN_WALK_KM = 0.05;
   const rail: TNode[] = [root];
-  if (hasAccessWalk && access) {
-    const wn = mk(1, LEFT_PAD + COL_W, RAIL_Y,
-      `Walk to ${access.stopName}`, "stop",
-      `→ ${access.distanceKm.toFixed(2)} km · ${access.durationMin} min`, {
-        name: access.stopName, lat: access.lat, lng: access.lng,
-      }, true);
-    rail.push(wn);
-    edges.push({
-      from: root, to: wn, option: {} as HopOption, confirmed: true,
-      label: "walk", mode: "walk", fromDepth: 0, km: access.distanceKm,
-    });
-  }
+  // A column offers the alternatives the NEXT level from the node sitting in it.
+  // The source column is level 0, and the node reached by chosen leg `d` is
+  // level d+1. (Missing the source column removed the whole first-hop fan before
+  // any leg was chosen — caught by scripts/browser_flows.py.)
+  const legCols: { node: TNode; level: number }[] = [{ node: root, level: 0 }];
+  let col = 0;
 
   for (let d = 0; d < confirmed.length; d++) {
     const opt = confirmed[d];
+    const access = opt.accessWalk;
+    if (opt.mode !== "walk" && access && (access.distanceKm ?? 0) >= MIN_WALK_KM) {
+      col += 1;
+      const wn = mk(col, LEFT_PAD + col * COL_W, RAIL_Y,
+        `Walk to ${access.stopName}`, "stop",
+        `→ ${access.distanceKm.toFixed(2)} km · ${access.durationMin} min` +
+        (access.isTransferWalk ? " · transfer" : ""), {
+          name: access.stopName, lat: access.lat, lng: access.lng,
+        }, true);
+      edges.push({
+        from: rail[rail.length - 1], to: wn, option: {} as HopOption, confirmed: true,
+        label: "walk", mode: "walk", fromDepth: d, km: access.distanceKm,
+      });
+      rail.push(wn);
+    }
+    col += 1;
     const km = havKm(opt.destinationStop, dest);
-    const node = mk(d + 1 + shift, LEFT_PAD + (d + 1 + shift) * COL_W, RAIL_Y,
+    const wait = opt.waitMin != null && opt.mode !== "walk"
+      ? ` · dep ${opt.departureTime ?? "—"}`
+      : "";
+    const node = mk(col, LEFT_PAD + col * COL_W, RAIL_Y,
       opt.destinationStop?.name ?? "Stop", "stop",
-      km != null ? `→ ${km.toFixed(1)} km to dest` : null, opt.destinationStop, true);
+      (km != null ? `→ ${km.toFixed(1)} km to dest` : "") + wait, opt.destinationStop, true);
     rail.push(node);
+    legCols.push({ node, level: d + 1 });
     edges.push({
       from: rail[rail.length - 2], to: node, option: opt, confirmed: true,
       label: edgeLabel(opt), mode: opt.mode ?? "walk",
@@ -223,8 +235,11 @@ function buildTree(
   // ---- destination cap ----------------------------------------------
   if (complete && rail.length > 1) {
     const last = rail[rail.length - 1];
+    const destRef: StopRef | undefined = dest
+      ? { name: dest.name ?? "Destination", lat: dest.lat, lng: dest.lng }
+      : undefined;
     const dm = mk(last.depth + 1, last.x + COL_W, RAIL_Y,
-      dest?.name ?? "Destination", "dest", "Final stop", dest ?? undefined, true);
+      dest?.name ?? "Destination", "dest", "Final stop", destRef, true);
     edges.push({
       from: last, to: dm, confirmed: true, label: "arrive", mode: "walk",
       fromDepth: last.depth, km: null, option: {} as HopOption,
@@ -233,15 +248,11 @@ function buildTree(
   }
 
   // ---- alternatives: fan above/below each rail node -----------------
-  // Iterate over rail node columns. The segment level feeding a rail column is
-  // (col - shift): the access-walk column consumed a column but no segment level.
-  // Confirmed may be empty (initial state) so Source's own branches always render.
-  const walkCol = hasAccessWalk ? 1 : -1;
-  for (const anchorNode of rail) {
-    const col = anchorNode.depth;
-    if (col === walkCol) continue;
-    const colLevel = col - shift;
-    if (colLevel < 0 || colLevel >= levels.length) continue;
+  // Walk and destination columns carry no level of their own, so they never get
+  // a fan. The source column is included, so the first hop's options show before
+  // any leg is chosen.
+  for (const { node: anchorNode, level: colLevel } of legCols) {
+    if (colLevel >= levels.length) continue;
     const seg = levels[colLevel];
     if (!seg) continue;
     const base = confirmed.slice(0, colLevel);
@@ -260,7 +271,7 @@ function buildTree(
       const km = havKm(opt.destinationStop, dest);
       const side = sides[k % sides.length];
       const offset = (Math.floor(k / sides.length) + 1) * ALT_OFF * side;
-      const node = mk(col + 1, LEFT_PAD + (col + 1) * COL_W, RAIL_Y + offset,
+      const node = mk(anchorNode.depth + 1, anchorNode.x + COL_W, RAIL_Y + offset,
         opt.destinationStop?.name ?? "Stop", "stop",
         km != null ? `\u2192 ${km.toFixed(1)} km to dest` : null, opt.destinationStop);
       edges.push({
@@ -398,18 +409,52 @@ export default function HopTreeView({ levels, confirmed, source, dest, complete,
             </button>
           </div>
           <div className="row mt8">
-            <span className="stat"><b>{detail.opt.durationMin ?? "—"}</b> min</span>
+            <span className="stat"><b>{detail.opt.durationMin ?? "—"}</b> min ride</span>
             {detail.opt.distanceKm != null && detail.opt.distanceKm > 0 && (
               <span className="stat"><b>{detail.opt.distanceKm.toFixed(1)}</b> km</span>
+            )}
+            {detail.opt.waitMin != null && detail.opt.mode !== "walk" && (
+              <span className="stat">
+                <b>{detail.opt.waitMin}</b> min wait
+              </span>
             )}
             <span className="stat">
               <b>{detail.opt.fare != null ? `₹${detail.opt.fare}` : detail.opt.mode === "walk" ? "Free" : "—"}</b>
               {detail.opt.perPersonFare != null ? ` (₹${detail.opt.perPersonFare}/pp)` : ""}
             </span>
           </div>
+          {(detail.opt.longWait || detail.opt.reachesNearDestination ||
+            detail.opt.isFinalWalk || detail.opt.accessWalk?.isTransferWalk) && (
+            <div className="row mt8 gap">
+              {detail.opt.longWait && (
+                <span className="badge warn">
+                  <span className="material-symbols-outlined">schedule</span> long wait
+                </span>
+              )}
+              {detail.opt.reachesNearDestination && (
+                <span className="badge info">
+                  <span className="material-symbols-outlined">flag</span> reaches the destination
+                </span>
+              )}
+              {detail.opt.isFinalWalk && (
+                <span className="badge">
+                  <span className="material-symbols-outlined">directions_walk</span> final walk in
+                </span>
+              )}
+              {detail.opt.accessWalk?.isTransferWalk && (
+                <span className="badge">
+                  <span className="material-symbols-outlined">transfer_within_a_station</span>
+                  {" "}walk to next stop ({detail.opt.accessWalk.distanceKm.toFixed(2)} km)
+                </span>
+              )}
+            </div>
+          )}
           <div className="muted small mt8">
             {detail.opt.departureTime ? `Departs ${detail.opt.departureTime}` : ""}
             {detail.opt.arrivalTime ? ` · arrives ${detail.opt.arrivalTime}` : ""}
+            {detail.opt.remainingToDestKm != null
+              ? ` · ${detail.opt.remainingToDestKm} km left to the destination`
+              : ""}
             {detail.opt.transitOptionsFromThisStop != null
               ? ` · ${detail.opt.transitOptionsFromThisStop} onward options`
               : ""}

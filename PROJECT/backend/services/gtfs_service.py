@@ -426,11 +426,32 @@ class GTFSService:
         return term
 
     def _shape_stops_index(self) -> dict[str, list[tuple[int, str]]]:
+        """shape_id -> ordered [(stop_sequence_position, stop_name)].
+
+        `stop_to_shapes` records one (shape, seq) entry per STOP PER TRIP, so a
+        shape used by 72 trips listed every one of its stops 72 times. The old
+        index kept all of them, which silently broke every consumer of
+        `shape_stop_sequence`:
+          - `names.index(stop)` landed on the first copy of a long duplicate run,
+            so "stops after X" was mostly X repeated (402-B DOWN: 720 entries but
+            only 10 distinct stops) and the hop builder could offer just a single
+            0.5 km micro-hop per route instead of the real ride to the far stop;
+          - ride duration/distance sliced between the wrong indexes;
+          - metro-transfer detection searched a meaningless stop list.
+        Collapsing the exact (shape, seq, stop) repeats gives the real sequence
+        (402-B DOWN -> 10 stops) while still keeping a genuine revisit of the
+        same stop at a different position (out-and-back shapes).
+        """
         if self._shape_stops is not None:
             return self._shape_stops
         idx: dict[str, list[tuple[int, str]]] = {}
+        seen: set[tuple[str, int, str]] = set()
         for stop_name, entries in self.data["stop_to_shapes"].items():
             for shape_id, seq in entries:
+                key = (shape_id, seq, stop_name)
+                if key in seen:
+                    continue
+                seen.add(key)
                 idx.setdefault(shape_id, []).append((seq, stop_name))
         for shape_id in idx:
             idx[shape_id].sort(key=lambda t: t[0])

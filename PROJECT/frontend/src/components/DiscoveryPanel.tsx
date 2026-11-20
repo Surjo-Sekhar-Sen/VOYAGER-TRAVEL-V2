@@ -1,13 +1,6 @@
 import { useApp, scoreClass } from "../context/AppContext";
+import { RatingBreakdown, photoUrl } from "./PlaceBits";
 import "./DiscoveryPanel.css";
-
-function photoUrl(place: { photo_name?: string | null }): string | undefined {
-  if (!place.photo_name) return undefined;
-  // SerpAPI hits come with a ready-to-fetch image URL; Google photo refs are
-  // proxied server-side to keep the key out of the browser.
-  if (place.photo_name.startsWith("http")) return place.photo_name;
-  return `/api/photo?name=${encodeURIComponent(place.photo_name)}`;
-}
 
 export default function DiscoveryPanel() {
   const { selected, showDiscovery, setShowDiscovery, setFlyTo, setDest, setMode } = useApp();
@@ -69,16 +62,35 @@ export default function DiscoveryPanel() {
             </details>
           )}
 
-          {selected.summary && (
+          <RatingBreakdown dist={selected.rating_distribution} />
+
+          {(selected.summary || selected.verdict) && (
             <div className={`ai-summary ${cls} mt12`}>
-              <b>AI review summary</b>
-              <p className="small">{selected.summary}</p>
+              <b>
+                {selected.summary_source === "llm" ? "AI review analysis" : "Review analysis"}
+              </b>
+              {selected.summary && <p className="small">{selected.summary}</p>}
+              {selected.verdict && (
+                <div className="verdict small"><b>Verdict:</b> {selected.verdict}</div>
+              )}
+              {selected.positives && selected.positives.length > 0 && (
+                <div className="concerns">
+                  <b>Praised</b>
+                  {selected.positives.map((c, i) => <div key={i} className="small">+ {c}</div>)}
+                </div>
+              )}
               {selected.concerns && selected.concerns.length > 0 && (
                 <div className="concerns">
                   <b>Concerns</b>
                   {selected.concerns.map((c, i) => <div key={i} className="small">• {c}</div>)}
                 </div>
               )}
+              {selected.reviews_sampled ? (
+                <div className="muted small">
+                  based on {selected.reviews_sampled} review{selected.reviews_sampled > 1 ? "s" : ""} Google returned
+                  {selected.user_rating_count ? ` · ${selected.user_rating_count.toLocaleString()} ratings in total` : ""}
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -88,10 +100,18 @@ export default function DiscoveryPanel() {
               {selected.reviews.slice(0, 5).map((r, i) => (
                 <div key={i} className="review glass">
                   <div className="spread">
-                    <span className="small"><b>{r.author_name || "Anonymous"}</b></span>
+                    <span className="row">
+                      {r.avatar ? (
+                        <img className="review-avatar" src={r.avatar} alt="" loading="lazy" />
+                      ) : (
+                        <span className="review-avatar fallback">{r.author_name?.[0] ?? "?"}</span>
+                      )}
+                      <span className="small"><b>{r.author_name || "Anonymous"}</b></span>
+                    </span>
                     <span className="small">{r.rating ? "★ " + r.rating : ""}</span>
                   </div>
                   {r.text && <p className="small">{r.text}</p>}
+                  {r.date && <div className="muted small">{r.date}</div>}
                 </div>
               ))}
             </div>

@@ -16,7 +16,16 @@ docker compose up -d graphhopper        # :8080 — the ONLY container needed (B
 python -m uvicorn backend.main:app --reload --port 8000
 cd frontend; npx vite --port 3000       # axios → http://localhost:8000/api (CORS enabled)
 ```
-QA: `python -m pytest tests/ -q` (104 pass) · `cd frontend; npx tsc --noEmit` (0 errors)
+QA: `python -m pytest tests/ -q` (122 pass) · `cd frontend; npx tsc -b` (0 errors)
+Browser QA (drives the real app, no deps): `python scripts/browser_flows.py` — needs headless Chrome
+on a debug port + vite on :3000, and checks the search→details photo, Nearby-from-search base and the
+hop tree's walk legs with zero console errors (`scripts/browser_check.py` is the CDP client).
+⚠️ Run ONE backend on :8000 — two `uvicorn` processes binding :8000 is a recurring trap; kill extras.
+
+> ⚠️ **`npx tsc --noEmit` is NOT a valid frontend check here.** The root `tsconfig.json`
+> is a solution file (`"files": []` + project references), so `--noEmit` type-checks NOTHING
+> and always reports 0 errors (it hid 23 real errors until 2026-10-14). Use `npx tsc -b`
+> (what `npm run build` runs) or `npm run build`.
 
 ## Architecture
 - Backend: FastAPI `backend/main.py` (CORS: localhost:3000 + *.onrender.com) → `api/routes.py`
@@ -58,8 +67,20 @@ QA: `python -m pytest tests/ -q` (104 pass) · `cd frontend; npx tsc --noEmit` (
 Next: enable Google billing (for real ratings/photos) → PROMPT_8.
 
 ## Known-current
-- Search returns real OSM places (no ratings/photos until Google billing re-enabled). CORS fixed.
+- Search: Google Places (New) first, then OSM + **SerpAPI resolution** — the SerpAPI hit supplies the
+  real rating, `place_id`, review bodies, the real per-star `rating_summary` and the place **photo**
+  (`thumbnail`). Photos therefore work WITHOUT Google billing (unlike `/api/photo`, which proxies
+  Google Places photo names and still needs billing).
+- LLM: the OpenRouter key in `.env` is dead (401) and several Gemini ids are retired — the provider/
+  model fallback chain in `agents/llm_agent.py` carries this (default `gemini-2.5-flash`). Review
+  analysis degrades to a deterministic, data-grounded summary (`summary_source: heuristic`).
 - HeaderBar + AToB have current-location buttons. Search suggestions appear after 2+ chars (300ms).
+- Nearby remembers the place you last searched (`AppContext.searchAnchor`) — switching to Nearby does
+  NOT fall back to GPS unless you press "My location"/Clear.
+- Hop tree shows a WALK column before every transit leg (incl. transfer walks) and offers a walkable
+  final leg to the destination when it is ≤2.2 km; a ride you cannot catch soon is never the headline
+  recommendation. `waitMin`/`longWait`/`reachesNearDestination`/`isFinalWalk`/`isTransferWalk` are the
+  fields to read (`MASTER_KNOWLEDGE_BASE.md` §37).
 - Map draws ONLY confirmed-hops polylines (no faint all-options spider-web); fitBounds spans the
   confirmed path, not the full segment-option set.
 - Always hard-refresh (Ctrl+Shift+R) before debugging a visual/behavioral bug — stale Vite bundles

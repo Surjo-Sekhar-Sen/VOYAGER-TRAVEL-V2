@@ -27,7 +27,7 @@ _SERP_BASE = "https://serpapi.com/search.json"
 _DEFAULT_TIMEOUT = 6.0
 _REVIEW_CACHE_S = 24 * 3600
 _PRICE_CACHE_S = 15 * 60
-_CACHE_VERSION = 2  # bump when the parsed schema changes (PROMPT_4 §2.3)
+_CACHE_VERSION = 3  # bump when the parsed schema changes (PROMPT_4 §2.3)
 
 
 class SerpAPIClient:
@@ -87,6 +87,12 @@ class SerpAPIClient:
                 "lng": gps.get("longitude"),
                 "rating": pr.get("rating"),
                 "reviews": pr.get("reviews"),
+                # real Google photo URL (the result's own image) — the client had
+                # been dropping this, so every search result rendered the grey
+                # "no photo" placeholder even though Google returned one.
+                "thumbnail": pr.get("thumbnail"),
+                "type": pr.get("type"),
+                "status": pr.get("status") or _open_state_text(pr.get("open_state")),
             }
         elif data.get("local_results"):
             first = data["local_results"][0]
@@ -99,6 +105,9 @@ class SerpAPIClient:
                 "lng": gps.get("longitude") or first.get("longitude"),
                 "rating": first.get("rating"),
                 "reviews": first.get("reviews"),
+                "thumbnail": first.get("thumbnail"),
+                "type": first.get("type"),
+                "status": first.get("status"),
             }
         self._store(key, out, _REVIEW_CACHE_S)
         return out
@@ -125,13 +134,28 @@ class SerpAPIClient:
                     "text": r.get("description", ""),
                     "date": r.get("date", ""),
                     "source": "serpapi",
+                    "avatar": r.get("user_thumbnail") or "",
+                    "author_review_count": r.get("user_review_count"),
                 })
+            # Google's own per-star tally over ALL ratings of the place, e.g.
+            # [{stars: 5, amount: 38910}, ...] — the real distribution, not just
+            # the handful of review bodies SerpAPI returns with the details.
+            dist = {}
+            for row in pr.get("rating_summary") or []:
+                try:
+                    stars = int(row.get("stars"))
+                    amount = int(row.get("amount"))
+                except (TypeError, ValueError, AttributeError):
+                    continue
+                if 1 <= stars <= 5 and amount >= 0:
+                    dist[stars] = amount
             out = {
                 "place_id": place_id,
                 "name": pr.get("title") or pr.get("name", ""),
                 "address": pr.get("address", ""),
                 "rating": pr.get("rating"),
                 "user_rating_count": pr.get("reviews"),  # int count, not the review list
+                "rating_distribution": dist,
                 "business_status": pr.get("status", pr.get("business_status")),
                 "open_now": (pr.get("open_state") or {}).get("open_now") if isinstance(
                     pr.get("open_state"), dict) else None,
@@ -139,6 +163,10 @@ class SerpAPIClient:
                     pr.get("hours"), dict) else [],
                 "phone": pr.get("phone"),
                 "website": pr.get("website"),
+                # photos the details call already returned: `thumbnail` is the
+                # place's own image URL, `photos_link` the gallery
+                "photo_url": pr.get("thumbnail"),
+                "photos_link": pr.get("photos_link"),
                 "reviews": reviews,
             }
         self._store(key, out, _REVIEW_CACHE_S)
@@ -198,6 +226,13 @@ class SerpAPIClient:
                 }
         self._store(key, out, _PRICE_CACHE_S)
         return out
+
+
+def _open_state_text(open_state) -> str | None:
+    """SerpAPI returns open_state either as a dict or as a plain string."""
+    if isinstance(open_state, dict):
+        return open_state.get("open_state")
+    return open_state if isinstance(open_state, str) else None
 
 
 def _json_dumps(obj) -> str:

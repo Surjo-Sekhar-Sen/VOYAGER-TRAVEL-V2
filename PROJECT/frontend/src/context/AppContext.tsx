@@ -1,5 +1,32 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import type { Coord, LatLng, LiveContext, NewsItem, PlaceDetails, PlaceResult, QuickPlan, RidePrice, SegmentResponse, TripInputData, WeatherNow } from "../types";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import type { Coord, LatLng, NewsItem, PlaceDetails, PlaceResult, QuickPlan, RidePrice, SegmentResponse, TripHopRoute, TripInputData, TripPlan, TripPlanPlace, TripTransportChoice, WeatherNow } from "../types";
+
+export const TRIP_STORAGE_KEY = "voyager.trip.v1";
+
+interface PersistedTrip {
+  input: TripInputData | null;
+  plan: TripPlan | null;
+  planKey: string | null;
+  transports: Record<string, TripTransportChoice>;
+  day: number | null;
+}
+
+function readPersistedTrip(): PersistedTrip {
+  try {
+    const raw = localStorage.getItem(TRIP_STORAGE_KEY);
+    if (!raw) throw new Error("empty");
+    const parsed = JSON.parse(raw) as Partial<PersistedTrip>;
+    return {
+      input: parsed.input ?? null,
+      plan: parsed.plan ?? null,
+      planKey: parsed.planKey ?? null,
+      transports: parsed.transports ?? {},
+      day: parsed.day ?? null,
+    };
+  } catch {
+    return { input: null, plan: null, planKey: null, transports: {}, day: null };
+  }
+}
 
 export type Mode = "search" | "atob" | "trip";
 
@@ -7,6 +34,15 @@ export interface NearbyBase {
   lat: number;
   lng: number;
   radiusM: number;
+}
+
+/** Where the last search was centred — lets "Nearby" search around the place
+ *  the user just looked up instead of throwing that away and falling back to
+ *  their GPS position. */
+export interface SearchAnchor {
+  name: string;
+  lat: number;
+  lng: number;
 }
 
 export interface JourneyState {
@@ -61,6 +97,8 @@ interface AppState {
   setQuickPlans: (p: QuickPlan[]) => void;
   nearbyBase: NearbyBase | null;
   setNearbyBase: (b: NearbyBase | null) => void;
+  searchAnchor: SearchAnchor | null;
+  setSearchAnchor: (a: SearchAnchor | null) => void;
   clearTransient: () => void;
 
   ridePath: Coord[] | null;
@@ -79,6 +117,22 @@ interface AppState {
 
   trip: TripInputData | null;
   setTrip: (t: TripInputData | null) => void;
+  tripPlan: TripPlan | null;
+  setTripPlan: (p: TripPlan | null) => void;
+  /** identity of the request the stored plan was generated for */
+  tripPlanKey: string | null;
+  setTripPlanKey: (k: string | null) => void;
+  /** null = full trip */
+  tripDay: number | null;
+  setTripDay: (d: number | null) => void;
+  tripTransports: Record<string, TripTransportChoice>;
+  setTripTransport: (key: string, choice: TripTransportChoice | null) => void;
+  clearTripTransports: () => void;
+  tripSelectedPlace: TripPlanPlace | null;
+  setTripSelectedPlace: (p: TripPlanPlace | null) => void;
+  /** geometry of the hop currently being previewed, drawn on the map */
+  tripHopRoute: TripHopRoute | null;
+  setTripHopRoute: (r: TripHopRoute | null) => void;
 
   flyTo: LatLng | null;
   setFlyTo: (p: LatLng | null) => void;
@@ -106,6 +160,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [fuel, setFuel] = useState<number | null>(null);
   const [quickPlans, setQuickPlans] = useState<QuickPlan[]>([]);
   const [nearbyBase, setNearbyBase] = useState<NearbyBase | null>(null);
+  const [searchAnchor, setSearchAnchor] = useState<SearchAnchor | null>(null);
   const [ridePath, setRidePath] = useState<Coord[] | null>(null);
   const [flowOpen, setFlowOpen] = useState(false);
   const [flowParams, setFlowParams] = useState({ groupSize: 1, budget: 500 });
@@ -116,8 +171,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
     active: false,
     position: null,
   });
-  const [trip, setTrip] = useState<TripInputData | null>(null);
+  const persisted = useState(readPersistedTrip)[0];
+  const [trip, setTrip] = useState<TripInputData | null>(persisted.input);
+  const [tripPlan, setTripPlan] = useState<TripPlan | null>(persisted.plan);
+  const [tripPlanKey, setTripPlanKey] = useState<string | null>(persisted.planKey);
+  const [tripDay, setTripDay] = useState<number | null>(persisted.day);
+  const [tripTransports, setTripTransports] = useState<Record<string, TripTransportChoice>>(persisted.transports);
+  const [tripSelectedPlace, setTripSelectedPlace] = useState<TripPlanPlace | null>(null);
+  const [tripHopRoute, setTripHopRoute] = useState<TripHopRoute | null>(null);
   const [flyTo, setFlyTo] = useState<LatLng | null>(null);
+
+  // Persist the last plan + per-hop choices so a reload restores the trip.
+  useEffect(() => {
+    try {
+      const payload: PersistedTrip = { input: trip, plan: tripPlan, planKey: tripPlanKey, transports: tripTransports, day: tripDay };
+      localStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      // storage disabled/full — the in-memory trip still works
+    }
+  }, [trip, tripPlan, tripPlanKey, tripTransports, tripDay]);
+
+  const setTripTransport = (key: string, choice: TripTransportChoice | null) => {
+    setTripTransports((prev) => {
+      const next = { ...prev };
+      if (choice) next[key] = choice;
+      else delete next[key];
+      return next;
+    });
+  };
+
+  const clearTripTransports = () => setTripTransports({});
 
   const toggleDark = () => {
     setDark((d) => {
@@ -134,6 +217,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setDest(source);
   };
 
+  // NOTE: `searchAnchor` deliberately survives clearTransient() so switching to
+  // the Nearby tab keeps searching around the place the user just looked up.
+  // clearQuery() (the search box's X) clears it explicitly.
   const clearTransient = () => {
     setPlaces([]);
     setSearchResults([]);
@@ -151,7 +237,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setJourney({ segments: null, chosenLegs: [], active: false, position: null });
   };
 
-  const value = useMemo<AppState>(() => ({
+  // NOTE: this object is rebuilt on every provider render on purpose. It used to
+  // be wrapped in useMemo with an incomplete dependency list, so `radiusKm`,
+  // `hoveredPlaceId`, `searching` and `searched` went stale for every consumer
+  // (hover-sync between the result cards and the map pins silently stopped
+  // working, and the nearby radius slider froze until another dep changed).
+  const value: AppState = {
     mode, setMode, dark, toggleDark,
     userLoc, setUserLoc,
     source, dest, setSource, setDest, swap,
@@ -162,15 +253,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     searching, setSearching, searched, setSearched, radiusKm, setRadiusKm,
     selected, setSelected, showDiscovery, setShowDiscovery,
     prices, setPrices, fuel, setFuel, quickPlans, setQuickPlans,
-    nearbyBase, setNearbyBase, clearTransient,
+    nearbyBase, setNearbyBase, searchAnchor, setSearchAnchor, clearTransient,
     ridePath, setRidePath,
     flowOpen, setFlowOpen, flowParams, setFlowParams,
     news, setNews,
     journey, setJourney,
     trip, setTrip,
+    tripPlan, setTripPlan, tripPlanKey, setTripPlanKey,
+    tripDay, setTripDay, tripTransports, setTripTransport, clearTripTransports,
+    tripSelectedPlace, setTripSelectedPlace,
+    tripHopRoute, setTripHopRoute,
     flyTo, setFlyTo,
-  }), [mode, dark, userLoc, source, dest, weather, places, searchResults, pinned, selected, showDiscovery,
-      prices, fuel, quickPlans, nearbyBase, ridePath, flowOpen, flowParams, news, journey, trip, flyTo]);
+  };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -68,6 +68,8 @@ export interface Review {
   text: string;
   date: string;
   source: string;
+  avatar?: string;
+  author_review_count?: number | null;
 }
 
 export interface PlaceDetails extends PlaceResult {
@@ -79,6 +81,13 @@ export interface PlaceDetails extends PlaceResult {
   pin_class?: "green" | "yellow" | "red" | null;
   summary?: string;
   concerns?: string[];
+  positives?: string[];
+  verdict?: string;
+  /** real Google per-star tally over ALL ratings, e.g. {5: 38910, 4: 17833} */
+  rating_distribution?: Record<string, number>;
+  /** how many review bodies the analysis was actually built from */
+  reviews_sampled?: number;
+  summary_source?: "llm" | "heuristic" | "none" | string;
 }
 
 // ============================================================ rides
@@ -120,6 +129,9 @@ export interface AccessWalk {
   lng: number;
   durationMin: number;
   distanceKm: number;
+  /** true when this walk is between two stops (bus → walk → bus) */
+  isTransferWalk?: boolean;
+  fromStop?: string;
 }
 
 export interface HopOption {
@@ -145,6 +157,15 @@ export interface HopOption {
   probeNext?: ProbeOption[];
   exceedsBudget?: boolean;
   accessWalk?: AccessWalk;
+  /** walkable last leg straight to the destination */
+  isFinalWalk?: boolean;
+  /** real wait at the boarding stop before this departure, minutes */
+  waitMin?: number | null;
+  /** wait longer than the builder's comfort threshold */
+  longWait?: boolean | null;
+  /** this ride ends within a short walk of the destination */
+  reachesNearDestination?: boolean;
+  remainingToDestKm?: number;
 }
 
 export interface ProbeOption {
@@ -194,6 +215,21 @@ export interface LiveContext {
     safety?: string;
   };
   errors?: string[];
+}
+
+// assistant (/api/langgraph/ask) — the live context the question is asked about
+// and the synthesis the backend returns (it never invents numbers).
+export interface AskContext {
+  source?: PlaceModel | null;
+  destination?: PlaceModel | null;
+  place?: PlaceResult | null;
+  groupSize?: number;
+  budget?: number;
+}
+
+export interface AskResponse {
+  live_context: LiveContext;
+  synthesis?: { answer?: string; factors?: string[] };
 }
 
 export interface ScoredRoute {
@@ -279,6 +315,9 @@ export interface TripInputData {
   budget: number;
   budgetShape: BudgetShape;
   budgetSplits: BudgetSplits;
+  /** Backend category keys (heritage, food, nature, ...). */
+  categories: string[];
+  /** Legacy label list kept for older saved drafts. */
   interests: string[];
   pace: Pace;
 }
@@ -286,12 +325,21 @@ export interface TripInputData {
 // ============================================================ trip plan (generated itinerary)
 export interface TripPlanPlace {
   id: string;
+  osm_id?: string;
+  /** Google place_id — enables live reviews/photos on the details panel. */
+  place_id?: string;
   name: string;
   category: string;
   description: string;
+  address?: string;
+  photo_url?: string;
   duration_min: number;
+  duration_known?: boolean;
   entry_fee: number;
+  entry_fee_child?: number | null;
+  entry_fee_known?: boolean;
   rating: number;
+  rating_known?: boolean;
   review_count: number;
   best_times: string[];
   crowd: Record<string, string>;
@@ -303,19 +351,31 @@ export interface TripPlanPlace {
   family_friendly: boolean;
   physically_demanding: boolean;
   accessibility_notes: string;
+  suitability?: Record<string, boolean>;
   destination: string;
   data_source: string;
   data_is_estimated: boolean;
+  verified?: boolean;
   score: number;
   components: Record<string, number>;
   why: string;
   rank: number;
+  // scheduling (added by generate_plan)
+  slot?: "early_morning" | "morning" | "afternoon" | "evening" | "night";
+  suggested_start?: string;
+  suggested_end?: string;
+  /** straight-line km from the previous stop on the same day */
+  travel_from_prev_km?: number;
 }
 
 export interface TripPlanDay {
   day: number;
+  theme?: string;
   place_count: number;
   total_activity_min: number;
+  total_distance_km?: number;
+  start_time?: string;
+  end_time?: string;
   places: TripPlanPlace[];
 }
 
@@ -323,10 +383,33 @@ export interface TripPlan {
   destination: string;
   group_type: string;
   interests: string[];
+  categories?: string[];
+  data_source?: string;
   pace: string;
   days: TripPlanDay[];
   total_places: number;
+  total_activity_min?: number;
+  total_distance_km?: number;
   disclaimer: string;
   relaxed: boolean;
   warning?: string;
+}
+
+// A travel option the traveller picked for one hop of the itinerary.
+export interface TripTransportChoice {
+  key: string;
+  mode: "transit" | "private" | "walk";
+  label: string;
+  detail?: string;
+  fare?: number | null;
+  duration_min?: number | null;
+  geometry: Coord[];
+  source?: "live" | "estimated" | "planned";
+  note?: string;
+}
+
+export interface TripHopRoute {
+  key: string;
+  mode: string;
+  geometry: Coord[];
 }

@@ -9,6 +9,7 @@ import TripInput, { TripResults } from "../components/TripPanel";
 import DiscoveryPanel from "../components/DiscoveryPanel";
 import NewsPopup from "../components/NewsPopup";
 import SegmentFlowView from "../components/SegmentFlowView";
+import TripPlaceDetails from "../components/TripPlaceDetails";
 import "./MainPage.css";
 
 const TABS: { key: Mode; label: string; icon: string }[] = [
@@ -69,7 +70,7 @@ export default function MainPage() {
       <HeaderBar />
       <div className="app-body">
         <motion.aside
-          className="input-window glass-strong"
+          className={`input-window glass-strong ${mode === "trip" ? "trip-input-window" : ""}`}
           layout
           transition={{ duration: 0.35, ease: EASE }}
         >
@@ -80,7 +81,7 @@ export default function MainPage() {
 
         {!(mode === "search" && !searchHasContent) && (
           <motion.aside
-            className="results-window glass-strong"
+            className={`results-window glass-strong ${mode === "trip" ? "trip-results-window" : ""}`}
             layout
             transition={{ duration: 0.35, ease: EASE }}
           >
@@ -115,6 +116,7 @@ export default function MainPage() {
         <NewsPopup />
 
         <DiscoveryPanel />
+        <TripPlaceDetails />
       </div>
 
       <nav className="bottom-nav glass-strong">

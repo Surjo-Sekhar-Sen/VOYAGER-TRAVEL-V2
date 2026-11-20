@@ -1,0 +1,3314 @@
+{
+  "generated_at": "2026-11-20T12:55:35.639377+00:00",
+  "bbox": [
+    12.85,
+    77.45,
+    13.1,
+    77.75
+  ],
+  "source_note": "Curated Bengaluru highlights. Coordinates, ratings and photos come from Google Maps via SerpAPI when resolved; descriptions, durations and crowd windows are curated estimates (data_is_estimated=True).",
+  "counts": {
+    "total": 68,
+    "by_category": {
+      "adventure": 3,
+      "food": 14,
+      "heritage": 8,
+      "museum": 8,
+      "nature": 10,
+      "nightlife": 5,
+      "religious": 8,
+      "shopping": 9,
+      "wellness": 3
+    }
+  },
+  "places": [
+    {
+      "id": "bg_adventure_bannerghatta",
+      "osm_id": "",
+      "place_id": "ChIJsW0ZC-BprjsRXzqh_3gub08",
+      "name": "Bannerghatta Biological Park",
+      "category": "adventure",
+      "description": "Zoo, safari and butterfly park where you can ride a safari bus past big cats in natural enclosures.",
+      "address": "National Park Rd, Bannerughatta, Byrappanahalli, Karnataka 560083, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfqMiHoqAeXvLM34vyCV5aliirzDzOBGtlFwRytMPPzcbDY8kHHiQq9e9gAEcE7pT6mareyfssjTA77rZpfdOtm_Qccz91SZFLmMOVmX7wvI5YXqk6bC7aFq9fzsAawJUDxgSVXuQ=w1000-h1000-c-n",
+      "duration_min": 240,
+      "duration_known": true,
+      "entry_fee": 400.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.2,
+      "rating_known": true,
+      "review_count": 139437,
+      "best_times": [
+        "early_morning",
+        "morning"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "afternoon": "medium"
+      },
+      "opening_hours": "Open 9:00 AM - 5:00 PM; closed Tuesdays",
+      "weekly_closures": [
+        "Tuesday"
+      ],
+      "lat": 12.800706,
+      "lng": 77.576531,
+      "tags": [
+        "adventure",
+        "nature"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Buggy available within safari route.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_adventure_snow_city",
+      "osm_id": "",
+      "place_id": "ChIJNcKzmE4WrjsRW2a7MA-1Zrs",
+      "name": "Snow City",
+      "category": "adventure",
+      "description": "An indoor snow park with slides and snow play on Jayamahal Road — a quick, air-conditioned family break.",
+      "address": "1st floor, Snow city, Fun World Complex, Jayamahal Main Rd, opposite TV Tower, J.C.Nagar, Bengaluru, Karnataka 560006, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfTPN5vwLw192TD9wEs4cOYgDerMID6jpnttVzNHLWbOTJF9Td7tlx489ijc_Tqj6r2XayoJMuSZooX9OJXrF3Cob1TK4bW6GrZ43qB06KyAVtH-gPnOSYI_CE6THCwqSi9y2y2=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.1,
+      "rating_known": true,
+      "review_count": 22929,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 13.00576,
+      "lng": 77.592061,
+      "tags": [
+        "adventure",
+        "family"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_adventure_wonderla",
+      "osm_id": "",
+      "place_id": "ChIJW3Or_8dHrjsROESo0OikUl4",
+      "name": "Wonderla Amusement Park",
+      "category": "adventure",
+      "description": "Large amusement and water park with rides and family zones south of the city.",
+      "address": "28th km, Mysore Rd, Bengaluru, Bannikuppe (Bidadi), Karnataka 562109, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdEUrKrYilS1GdgkW3d4SYCvkEHpXOqCpC_pmdFmuIy4p9SQ5UXhFdcqbFiK3GB1JtJ-9dRCVuVYUTGqbaLvjFjB5blGDl8Q9BVMFzgrKvmzk-g102B6cWkwYMkWT3RtcHCkicwUA=w1000-h1000-c-n",
+      "duration_min": 360,
+      "duration_known": true,
+      "entry_fee": 1600.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 117059,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "high"
+      },
+      "opening_hours": "Open ~11 AM - 6 PM (approx)",
+      "weekly_closures": [],
+      "lat": 12.835037,
+      "lng": 77.400824,
+      "tags": [
+        "adventure",
+        "family",
+        "nature"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Rides may have height limits.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_airlines_hotel",
+      "osm_id": "",
+      "place_id": "ChIJ1Wpce3kWrjsRnJRhLAVNM4M",
+      "name": "Airlines Hotel",
+      "category": "food",
+      "description": "A leafy old-school garden restaurant on Lavelle Road, famous for dosas, filter coffee and unhurried mornings.",
+      "address": "No 4, State Bank of India Rd, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLe45AhNUQcnrnSekbLokpGPGXA4Bov-RxgWGM5D75wNLNL3jml8s38Pa0zUT0S69vY2IhZp_zawC2hp62hLgPFWVGJXQWAcaYuTnUyipRn0YWD63MLPdu87ESWlZvsPb2JGu5M=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.0,
+      "rating_known": true,
+      "review_count": 21430,
+      "best_times": [
+        "early_morning",
+        "morning"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.972927,
+      "lng": 77.599916,
+      "tags": [
+        "breakfast",
+        "food",
+        "heritage"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_albert_bakery",
+      "osm_id": "",
+      "place_id": "ChIJgRShhJMVrjsRJFthQNsJH6g",
+      "name": "Albert Bakery",
+      "category": "food",
+      "description": "A Frazer Town bakery legendary for its evening kebabs and mutton samosas, sold from a tiny counter.",
+      "address": "93, Mosque Rd, Cleveland Town, Fraser Town, Bengaluru, Karnataka 560005, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLePzq804RBsWy9nrcE_d5CBoMMsi0505p7LFF26QtPUY4BP4Ts7UsWksG5Socmu94AYRqmRuw-bKLdTPAEv5d7Wudb122IVvFX9EqeQ3Z2LjRslArHyIN_DJ4sUKLyjxxnpmXUWcA=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.2,
+      "rating_known": true,
+      "review_count": 4060,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.99686,
+      "lng": 77.614411,
+      "tags": [
+        "food",
+        "offbeat",
+        "street_food"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_brahmin_s_coffee_bar",
+      "osm_id": "",
+      "place_id": "ChIJ44pbo_AVrjsRZLlc5NF2IcA",
+      "name": "Brahmin's Coffee Bar",
+      "category": "food",
+      "description": "A tiny, cash-only Basavanagudi counter famous for idli, vada and some of the city's best filter coffee.",
+      "address": "Pushp Kiran, 19, Ranga Rao Rd, near Shankar Mutt Road, Shankarapura, Bengaluru, Karnataka 560004, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdaTBTEqEg7bGBGxzzdAj8LuVIUs8rI7Sj9h_yaqnRUn3_DDpQo1VwHOfo7uNkdfu3uC1Ses6p4veu0tA5W6MI5FfXue-085dkgmuxZa4_rv8I4i4K2UjU_gxVB7MA9v2gQeRtDN4KveY0U=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 23588,
+      "best_times": [
+        "early_morning",
+        "morning"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "Open ~6:30 AM - 12:00 PM",
+      "weekly_closures": [],
+      "lat": 12.953972,
+      "lng": 77.568847,
+      "tags": [
+        "breakfast",
+        "food",
+        "offbeat"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_ctr_shri_sagar_ctr",
+      "osm_id": "",
+      "place_id": "ChIJ82NqvCUWrjsRC33A4yTYQWk",
+      "name": "CTR (Shri Sagar CTR)",
+      "category": "food",
+      "description": "Malleshwaram's beloved benne masala dosa joint, crisp and butter-heavy, with a queue that moves fast.",
+      "address": "7th Cross Rd, Malleshwaram, Bengaluru, Karnataka 560003, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdYNTqbQ4UoYVXfDibbUH_m8DGcCsqYwxRJTwXQ_XmZl3mcEGeFy-vZbnnq6STETLdE975Rs3N9eokOh75B38tLU1bMTcyk5jl9PPH2q5JIpCZG1wAFwyT5p_69PBaZHyGI8wzs_A=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.3,
+      "rating_known": true,
+      "review_count": 37882,
+      "best_times": [
+        "afternoon",
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "Open ~7:30 AM - 12:30 PM, 4:00 PM - 9:00 PM",
+      "weekly_closures": [],
+      "lat": 12.998233,
+      "lng": 77.569539,
+      "tags": [
+        "breakfast",
+        "food",
+        "heritage"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_corner_house_ice_cream",
+      "osm_id": "",
+      "place_id": "ChIJ5Z_REfsXrjsRJQKf2HO5VUA",
+      "name": "Corner House Ice Cream",
+      "category": "food",
+      "description": "A Bengaluru dessert institution — order a Death by Chocolate and share it.",
+      "address": "BBMP East, GK Complex, No 45/3, Residency Rd 1st Cross, Bengaluru, Karnataka 560025, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfNsP2JvKC1sax_tcim4O5pnOmYb8-5Lp51XwW7Bm3PZUV29vHwKWdmE49TRvMDvdnF7VMf6ONewyjQh9CTCU1lUCzlFhQFr0pWtMRiG0xpqjatZJnfZsjCbQ1Q5mXt7MNeHRx49liRRHyJ=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 3767,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.973699,
+      "lng": 77.609381,
+      "tags": [
+        "dessert",
+        "family",
+        "food"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_empire_restaurant",
+      "osm_id": "",
+      "place_id": "ChIJRRUYXhAWrjsR6Jxat7CodnA",
+      "name": "Empire Restaurant",
+      "category": "food",
+      "description": "A late-night Bengaluru chain for kebabs, biryani and roomali roti — reliable after a long evening.",
+      "address": "Majestic, ABM Building, 70, 6th Cross Rd, Gandhi Nagar, Bengaluru, Karnataka 560009, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfxWiW2gVFPbfm5Bkx5EsLfxKpSXDa6ObC9BsjzccD9PMsN8dZlsRLfMPOa26_3FKl3Tzi8HW-iSSLNTh0Xu2HWSc237AkjmrCgwzSghnTiRtqqBUB8vX8Yf7B8INfLHcb1qa9E=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 30074,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.979764,
+      "lng": 77.575086,
+      "tags": [
+        "biryani",
+        "food",
+        "late_night"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_koshy_s",
+      "osm_id": "",
+      "place_id": "ChIJiUM0g3sWrjsRCjn7KPYh3gk",
+      "name": "Koshy's",
+      "category": "food",
+      "description": "A colonial-era coffee house on St. Mark's Road where politicians and writers still argue over breakfast.",
+      "address": "39, St Mark's Rd, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLd40_IQkxKjkMp3Wso2fY9JWBzfSr9ldUoKKmbBh330jh18rFWpVuHkD1f6VRm85s4Qlx_9EABwGmRKF17BVySx-tjYtQfbl3qVuEwyOthCUhnD_9HV5oV1V2_7zzAn3M1NPIbD_ZNt2scl=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 3.8,
+      "rating_known": true,
+      "review_count": 10615,
+      "best_times": [
+        "afternoon",
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.975643,
+      "lng": 77.601405,
+      "tags": [
+        "breakfast",
+        "food",
+        "heritage"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_mtr",
+      "osm_id": "",
+      "place_id": "ChIJaaWjpN0VrjsRAsmfiafDlN4",
+      "name": "Mavalli Tiffin Rooms (MTR)",
+      "category": "food",
+      "description": "Heritage South Indian restaurant serving breakfast classics since 1924.",
+      "address": "14, Lal Bagh Main Rd, Doddamavalli, Sudhama Nagar, Bengaluru, Karnataka 560027, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcjdKkOqARbX2PuYY3GhvahD6KSudoZztWAzoayHtCK44qjwaUPBzacRmroZxhT0_zIGb8sqTDz4ygjC0SdRy_9TSerUEusQjmwM_aZ9KhS0_V17BXPLF9-EDa2sHcPioXAvZ6Cvw=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.3,
+      "rating_known": true,
+      "review_count": 40070,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "high",
+        "afternoon": "medium"
+      },
+      "opening_hours": "Open 6:30 AM - 10:00 PM",
+      "weekly_closures": [],
+      "lat": 12.955182,
+      "lng": 77.585557,
+      "tags": [
+        "food",
+        "heritage"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_shivaji_military_hotel",
+      "osm_id": "",
+      "place_id": "ChIJqW0KBHcVrjsR6ZxxwAWap8U",
+      "name": "Shivaji Military Hotel",
+      "category": "food",
+      "description": "A no-frills Jayanagar institution for donne biryani and mutton dishes, served fast and cheap.",
+      "address": "1st C, 718, Main, 45th Cross Rd, 8th Block, Jayanagar, Bengaluru, Karnataka 560070, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLe_3bdjAVJyQtNFNey7tACR0-oQH3s-uHSeJ9nDkykye6jsHfSOSGon4DsXSxf6S4ouBHzYIkEO0JHRgVs4FZ517DWsBd8vCe0thv6iI_WWjE0b5nAe8uFZjjWIWNyYwxaJYWardilT2lsv=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 3.8,
+      "rating_known": true,
+      "review_count": 24750,
+      "best_times": [
+        "afternoon",
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.918006,
+      "lng": 77.573966,
+      "tags": [
+        "biryani",
+        "food",
+        "heritage"
+      ],
+      "family_friendly": false,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": false,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_the_rameshwaram_cafe",
+      "osm_id": "",
+      "place_id": "ChIJmdq205oXrjsRrn9q3VqwI9g",
+      "name": "The Rameshwaram Cafe",
+      "category": "food",
+      "description": "A wildly popular Indiranagar counter for ghee podi idli, rava dosa and quick filter coffee.",
+      "address": "847/1(Old No. 847/A), Binnamangala 1st Stage, 100 Feet Rd, Bengaluru, Karnataka 560038, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLegK2GnW3vp3ltlc84r-o8ncPs5evfpDMzmIEyST25V1FDdj74I5fe5AA3P9tG9Qzm_dTGhBxtHGJVO3uj084cAzidV2urLNO-KAaIS_2nqGB31TpaUkXVm1g6qgNMXq7joKKE=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.3,
+      "rating_known": true,
+      "review_count": 21737,
+      "best_times": [
+        "afternoon",
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.98168,
+      "lng": 77.640918,
+      "tags": [
+        "breakfast",
+        "food",
+        "street_food"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_toit_brewpub",
+      "osm_id": "",
+      "place_id": "ChIJc0JAFaUWrjsRRXSXJPX7YFo",
+      "name": "Toit Brewpub",
+      "category": "food",
+      "description": "Indiranagar's original craft brewery, with house-brewed beers, wood-fired pizzas and a lively upstairs bar.",
+      "address": "6/2, 100 Feet Rd, near Drops Total Spirites, Binnamangala, Stage 1, Indiranagar, Bengaluru, Karnataka 560038, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcof12h5385sHecfLSWdpyUSiBR8gxFTgs_OulYItak_-ZMCYQ2_r-R0bEbHXVnRmJTkyZseUSaEOP9ZtwUr0frKTd00vZn-zBTWH0qwqzkj3Ech6LW1tREO4hoI-U-0V7px6lwUj3FLaJc=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 62971,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.979544,
+      "lng": 77.640654,
+      "tags": [
+        "brewery",
+        "food",
+        "nightlife"
+      ],
+      "family_friendly": false,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": false,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_truffles",
+      "osm_id": "",
+      "place_id": "ChIJdz4L2VEUrjsRvSsPGCwDl2I",
+      "name": "Truffles",
+      "category": "food",
+      "description": "The student-favourite burger joint off 5th Block, known for its all-American burgers and thick shakes.",
+      "address": "Ground Floor, A Wing, Apex Building, 93/A, 4th B Cross Rd, 5th Block, Koramangala, Bengaluru, Karnataka 560095, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLc5beXlD_CW3CedbvnzB_Iw7WjM_Z_5s4wfuH_5cCdlJzvT7iNbkCEGs2HewIiXaeFdftDGvc6hmNsSWRCZG6AIUI8dQj3rlJGSWcoZAAq42dX8iQl15yGJfCxOxKD4XH9CiwF4ZPzJyC2F=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 51149,
+      "best_times": [
+        "afternoon",
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.933532,
+      "lng": 77.614318,
+      "tags": [
+        "fast_food",
+        "food"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_vvpuram",
+      "osm_id": "",
+      "place_id": "ChIJH-raknwVrjsRoJppMsw-y2U",
+      "name": "V V Puram Food Street",
+      "category": "food",
+      "description": "Iconic open-air South Indian food street with dosas, filter coffee and sweet stalls.",
+      "address": "Sajjan Rao Circle, Food St, Vishweshwarapura, Bengaluru, Karnataka 560004, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcvIlIUzcgRwMkir02zCR_rcXOoXEVfziPL9c47SaKevOYy4wOT3RkHa_9YYuBGfKke1REQla-L7FXdYLeYav_3DYfUi0fti0wzQUsiT2gyKQ7n315uGsnSQLsfYUW17ud8eH6S8wQOM5SJ=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.2,
+      "rating_known": true,
+      "review_count": 23670,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "Street food evenings, ~6 PM onwards",
+      "weekly_closures": [],
+      "lat": 12.950917,
+      "lng": 77.577741,
+      "tags": [
+        "food",
+        "nature"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_food_vidyarthi_bhavan",
+      "osm_id": "",
+      "place_id": "ChIJNdCK6PIVrjsR3I4feeftf-0",
+      "name": "Vidyarthi Bhavan",
+      "category": "food",
+      "description": "A 1943 Basavanagudi institution serving thick, ghee-laden dosas with chutney — expect a queue at breakfast.",
+      "address": "32, Gandhi Bazaar Main Rd, Gandhi Bazaar, Basavanagudi, Bengaluru, Karnataka 560004, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeh-LD8kTGaTmI4z-oZPGOp-OpQs5KMYhnAjKgqpO8a9CeImHnMvF-mgmV3-L04PrrJa_7HLS2_u30BpA6LQUwqk33zTQALMBez1qYczWluPVcbb5Un-FJV9DWWBEGgk3zjiAE=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.2,
+      "rating_known": true,
+      "review_count": 58994,
+      "best_times": [
+        "afternoon",
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "high",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "Open ~6:30 AM - 11:30 AM, 2:00 PM - 8:00 PM",
+      "weekly_closures": [],
+      "lat": 12.945046,
+      "lng": 77.571381,
+      "tags": [
+        "breakfast",
+        "food",
+        "heritage"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_heritage_attara_kacheri",
+      "osm_id": "",
+      "place_id": "ChIJvfT02nEWrjsROdFY-_d7noU",
+      "name": "Attara Kacheri",
+      "category": "heritage",
+      "description": "The crimson Neo-Classical High Court building facing Vidhana Soudha, one of the city's grandest colonial facades.",
+      "address": "opposite to Vidhana Soudha, Ambedkar Veedhi, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeicW2QBs4gC4YYhQM_Uzab1Pe_fvBWZ3CaikUZG0hXfEadf3HiMgukEiKA0VDtWgv_he62U2rb-va0N2I3NnQeo0H2K9o1DQFAKq4GBXIIVn90X21yX1kCpqpaJz_p9X1oUvk9=w1000-h1000-c-n",
+      "duration_min": 20,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 1348,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.977887,
+      "lng": 77.592555,
+      "tags": [
+        "heritage",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_heritage_bangalore_fort",
+      "osm_id": "",
+      "place_id": "ChIJVx06BOMVrjsR1-a9CQJZpLI",
+      "name": "Bangalore Fort",
+      "category": "heritage",
+      "description": "The surviving gateway and ramparts of Kempegowda's 16th-century mud fort, later rebuilt in stone by Tipu Sultan.",
+      "address": "XH7G+49C, Krishna Rajendra Rd, New Tharagupet, Bengaluru, Karnataka 560002, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLch9l5ntwSE_ATp2Yz3kgZ7E97kRWtukQ0V2CrcNlFNGVLHJs6EzedyBO7TezrzEmjtte2uDY9-BG7hAE3d6BgZxR_az0ACo54pCYXhLHXdPcA9jirZbSla3yWGniBuznj0kVzzXVM1Z24=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.0,
+      "rating_known": true,
+      "review_count": 27018,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.962802,
+      "lng": 77.575886,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_heritage_palace",
+      "osm_id": "",
+      "place_id": "ChIJN1ZKKUkWrjsRzxIVM363-LE",
+      "name": "Bengaluru Palace",
+      "category": "heritage",
+      "description": "Tudor-style royal palace with grand halls, art and photography-friendly interiors.",
+      "address": "Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLe75c4yhVqTpkYcFwp9ANHWWmH6MH_rrT2DvOzjEMnzitHGZ6hprXTfH3t8E_1p_QDDviaI4-H_guGh2T9irPNc_kh8Kk2QsazYWPYyh2_a0d7BvVgUyvs8iZtwaOY183fRFalU4IMYvElt=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 500.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.1,
+      "rating_known": true,
+      "review_count": 101204,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "Open 10:00 AM - 5:30 PM",
+      "weekly_closures": [],
+      "lat": 13.003507,
+      "lng": 77.589095,
+      "tags": [
+        "heritage",
+        "museum",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Sloppy gravel paths, uneven in places.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_offbeat_devanahalli",
+      "osm_id": "",
+      "place_id": "ChIJu9PQfoPisTsRbepyTxsj700",
+      "name": "Devanahalli Fort",
+      "category": "heritage",
+      "description": "Birthplace fort of Tipu Sultan in Devanahalli town, near the airport — an offbeat heritage stop.",
+      "address": "near, Devanahalli District, Hyderabad - Bengaluru Hwy, Devanahally, Karnataka 562110, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcDtRII21d3EM0H0OmHr273_mspNurlfGmZs7e2OrsGCJ7x2lLXdcofXG2WSy41K61gT4-yAtUTuoRlZS7_AbAkObcl_PDmjhreXPm3kau0xC9q5fewjx3mtloBoSPODE4oaa6_LQ=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 3.9,
+      "rating_known": true,
+      "review_count": 8648,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "low",
+        "evening": "medium"
+      },
+      "opening_hours": "Open daytime (approx)",
+      "weekly_closures": [],
+      "lat": 13.249616,
+      "lng": 77.708388,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": true,
+      "accessibility_notes": "Rough paths; not wheelchair accessible.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": false,
+        "physical_demand": true
+      }
+    },
+    {
+      "id": "bg_heritage_freedom_park",
+      "osm_id": "",
+      "place_id": "ChIJX5m7gw0WrjsRtuZKH4Cp8xY",
+      "name": "Freedom Park",
+      "category": "heritage",
+      "description": "A former central jail turned public park, with the old prison walls, watchtowers and a graffiti-scarred facade.",
+      "address": "Sheshadri Rd, Gandhi Nagar, Bengaluru, Karnataka 560009, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLerFnOHQfzSJLjA-3vfR5dn-M5YEKU-tQQIVZGfxagPJtdsZ-IBfqPueGZzm9pheW8ltL54tVDHGwQwM87Zt3Tt77psGwj0ozlco-M7Mr8dE4aiCIIiJe8TG3qBk2gmQ0S6FIBf=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.2,
+      "rating_known": true,
+      "review_count": 20362,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.977916,
+      "lng": 77.582188,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "photo",
+        "walk"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_heritage_mayo_hall",
+      "osm_id": "",
+      "place_id": "ChIJOdTXKYcWrjsRDex15XvYloo",
+      "name": "Mayo Hall",
+      "category": "heritage",
+      "description": "A restored 1883 colonial hall on MG Road with arched verandas and a pocket museum of city history.",
+      "address": "14, 7, Mahatma Gandhi Rd, FM Cariappa Colony, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfhLMpvmKjzRRt8N-A5lCKFDIpkADxbXHSNZvXeCLtccjQEN8ZnXdqjg0WX8HxRE1aH2Fw9mMiwh16Q6oXpwcu9dLc2WE8EZYlb1zddl-tg9slXmGzehyrBA9ZrrHATekt4qXn1=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.3,
+      "rating_known": true,
+      "review_count": 478,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.974111,
+      "lng": 77.61065,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_heritage_tipu",
+      "osm_id": "",
+      "place_id": "ChIJAeY0tOQVrjsRdZ8hleP7aRo",
+      "name": "Tipu Sultan's Summer Palace",
+      "category": "heritage",
+      "description": "18th-century teak palace with balconies, murals and a small history museum of the Mysuru Sultanate.",
+      "address": "42, Tippu Sultan Palace Rd, Kamalanagar, Chamrajpet, Bengaluru, Karnataka 560018, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcB_hPsimC9mxVFl3oLYrDKgoO9C8Zqli7rfRyLjitHHUbXGiRy5qIpWv6YW07Mck-rdRSf_ovHGWtDYu6w-N5hCi0r7qE8_17qGxoj3hsYQsGt2l7iVVmwzXOsJR5rswSJs2u65g=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 20.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 3.9,
+      "rating_known": true,
+      "review_count": 32872,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "Open 8:30 AM - 5:30 PM",
+      "weekly_closures": [],
+      "lat": 12.959351,
+      "lng": 77.573641,
+      "tags": [
+        "heritage",
+        "museum",
+        "offbeat",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_heritage_vidhana",
+      "osm_id": "",
+      "place_id": "ChIJpwxMCXIWrjsRfedVMltgoP8",
+      "name": "Vidhana Soudha",
+      "category": "heritage",
+      "description": "Granite legislative palace and an iconic landmark — best for photography (viewed from outside).",
+      "address": "Dr Ambedkar Rd, Sampangi Rama Nagara, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeK-u2xpPxmmmRWr-D6JnQTug26L-YzM8-g1-uQHPLay0O-RIK_HqjIQe5GDEqAZLjWKnVOQQm-s-6W42b0KjPDq8YoB7aJJmN7zoiSTWIounjBMO41NtztMVStoK42Qarnx8TM=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.6,
+      "rating_known": true,
+      "review_count": 7156,
+      "best_times": [
+        "early_morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "Public entry on prior permission; exterior free",
+      "weekly_closures": [],
+      "lat": 12.979603,
+      "lng": 77.590853,
+      "tags": [
+        "heritage",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_museum_bangalore_aquarium",
+      "osm_id": "",
+      "place_id": "ChIJSXQE4HAWrjsRyeiku6FOYT4",
+      "name": "Bangalore Aquarium",
+      "category": "museum",
+      "description": "A compact aquarium beside Cubbon Park with freshwater and marine tanks — a quick stop with kids.",
+      "address": "Kasturba Rd, Shanthala Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfQwjlo0KQhYmuxGMILqzWW__7Cv2L-whZDpS_9qj3Q3rp_rrTIINWCKhCh7eIn8bPC40YQppEUq6iGOERQ7il5kwWzdgZLRL6LwSQDtySkhDpBZ4iaH5rRMo38hdiYtkAHd11FlcO9_rTg=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 3.9,
+      "rating_known": true,
+      "review_count": 10350,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.976515,
+      "lng": 77.59854,
+      "tags": [
+        "family",
+        "museum"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_offbeat_hal",
+      "osm_id": "",
+      "place_id": "ChIJg2Ir7MMTrjsR9kqAcrWsFew",
+      "name": "HAL Heritage Centre & Aerospace Museum",
+      "category": "museum",
+      "description": "Showcases vintage Indian Air Force and HAL aircraft — a quirky aviation offbeat pick.",
+      "address": "Police Station, Near HAL, HAL Old Airport Rd, Marathahalli, Bengaluru, Karnataka 560037, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLf_wiKo6VMat6kINfqwm6byw9VAEA0eiUE9jwms_3WTXoMF3dL9VvXyjyjcQuCLpgTM97m868aD6tTn6MOd_8J3QwcqLU4M4bXm3od10-Q2KFiPoWtzwJi0WHGCOouS_8J8XEw=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 50.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 34533,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "Open 9:00 AM - 5:00 PM (approx)",
+      "weekly_closures": [],
+      "lat": 12.954655,
+      "lng": 77.680906,
+      "tags": [
+        "museum",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_museum_indian_music_experience_museum",
+      "osm_id": "",
+      "place_id": "ChIJq6oaOEcVrjsRaApSFOeyX_M",
+      "name": "Indian Music Experience Museum",
+      "category": "museum",
+      "description": "An interactive music museum in JP Nagar where you can play instruments, trace ragas and record a track.",
+      "address": "Brigade Millenium Rd, JP Nagar 7th Phase, J. P. Nagar, Bengaluru, Karnataka 560078, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfEBh_ijAS85BPNrIWYqPbHlOx2u6LwrMwzz0cYHyPIe69aL-nWWZp1Yx4IXpfYVAMJzaZLe00LzlR4jw-3rKHbGn_DWXN_0KiI9m7C0YPzIyM4YePNzD4LFONNyikoCe9GavUoUdlDN_I=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.6,
+      "rating_known": true,
+      "review_count": 3604,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.891782,
+      "lng": 77.583711,
+      "tags": [
+        "family",
+        "museum",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_museum_kempegowda_museum",
+      "osm_id": "",
+      "place_id": "ChIJcYeXKYcWrjsR6iKUZGlFMdY",
+      "name": "Kempegowda Museum",
+      "category": "museum",
+      "description": "A small museum in Mayo Hall telling the story of Bengaluru's founder, Kempegowda, and the city's early layout.",
+      "address": "Field Marshal Cariappa Rd, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcXMDeaC2vHor8Ic3Dzem9TVBg1DRtDETwCG7x8EVsPjHMXTopSyvQ4VjOEQSgOL6JoXilaxz6NXEPs3mYb0T-wH5Kil3EAXQLKjCsZgxhmIRUohkDIz51BAkZqI8nj8Pc46fw=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.0,
+      "rating_known": true,
+      "review_count": 241,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.974042,
+      "lng": 77.610517,
+      "tags": [
+        "heritage",
+        "museum",
+        "offbeat"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_museum_museum_of_art_photography_map",
+      "osm_id": "",
+      "place_id": "ChIJK3WK06kXrjsRtJJUPxlNE4A",
+      "name": "Museum of Art & Photography (MAP)",
+      "category": "museum",
+      "description": "A contemporary museum on Kasturba Road with rotating photography and art shows and a good cafe.",
+      "address": "XHFW+RP8, 22, Kasturba Rd, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLevj7CM2RZDw5qMvR8vdlNrFVT1w6Cd8yW3u69dARwIL6ipvVJjsxeK_PNLwaM3tsazKvP5cziIKM_tNeCSh1MOFhsTVR1D-TU-rKaSx4R0C09HxpSuwKuBbaHNLZe0L8RWQEeFGQA8vr0=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 2843,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.974603,
+      "lng": 77.596754,
+      "tags": [
+        "food",
+        "museum",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_museum_ngma",
+      "osm_id": "",
+      "place_id": "ChIJqZQybIEWrjsRezNLL4Ju2Gk",
+      "name": "National Gallery of Modern Art",
+      "category": "museum",
+      "description": "Modern and contemporary Indian art in a restored palace garden setting.",
+      "address": "Manikyavelu Mansion, GF, 49, Palace Rd, Vasanth Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcXfMMQRLTpWcE4mhj5O4dVWKSpKZlx2yPpUVCHb332pDqAgNq7hqTXCbXZ6YeVqPvxFmByIW_zCHricsheJ1R8DawN05j9c089xrEX7BFK1iqzWRyKA3UIKtws1OjcQc7bZ8yULNJ5mGsT=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 30.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 2203,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "Open 10:00 AM - 5:00 PM; closed Mondays",
+      "weekly_closures": [
+        "Monday"
+      ],
+      "lat": 12.989412,
+      "lng": 77.588055,
+      "tags": [
+        "heritage",
+        "museum",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Ramps and lifts to most galleries.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_museum_rangoli_metro_art_center",
+      "osm_id": "",
+      "place_id": "ChIJL8oz9HwWrjsRzjhm5CWU1p8",
+      "name": "Rangoli Metro Art Center",
+      "category": "museum",
+      "description": "A free art space under the MG Road metro viaduct with murals, installations and rotating exhibitions.",
+      "address": "Metro Station, Beside, Mahatma Gandhi Rd, Shivaji Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLewT6LOKr5hs-xlRunvYy5sjmCRj8hafbE8dPn7oNkuyvqvaSRzlxjCFcVunVcoFt8r4UfABv5IxSnH030gkUetIv6y6x_vy4PiV9O5q6MaXnTjcFgHQvVioeW83SsDIRssk26o=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 1564,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.976305,
+      "lng": 77.60379,
+      "tags": [
+        "museum",
+        "offbeat"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_museum_vitm",
+      "osm_id": "",
+      "place_id": "ChIJqyoigt8VrjsRp_hKR5Y_1X8",
+      "name": "Visvesvaraya Industrial & Technological Museum",
+      "category": "museum",
+      "description": "Hands-on science museum with interactive exhibits — a hit with kids and families.",
+      "address": "5216, Kasturba Rd, near Chinna Swamy Stadium, Ambedkar Veedhi, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfrvpv8P30PS_8kUnGSiVaLK-lGXwXOuOmZgYnm2WFbD4mC1FOWfiDyF174cGZcsriWIkLl9EmSzM6BM9HQtMQQuLFKzViMGcU9sEsyKjjWF1VrYkVQYNd4kP_vgG9AxDpOin1N_w=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 25.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.6,
+      "rating_known": true,
+      "review_count": 17607,
+      "best_times": [
+        "morning",
+        "afternoon"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "high"
+      },
+      "opening_hours": "Open 10:00 AM - 5:30 PM; closed Mondays",
+      "weekly_closures": [
+        "Monday"
+      ],
+      "lat": 12.975159,
+      "lng": 77.59642,
+      "tags": [
+        "adventure",
+        "museum",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nature_big_banyan_tree",
+      "osm_id": "",
+      "place_id": "ChIJUa8ctpwUrjsR-d-H0fTedSU",
+      "name": "Big Banyan Tree",
+      "category": "nature",
+      "description": "A 400-year-old banyan whose aerial roots spread over three acres — a cool, photogenic stop on the way to Mysuru.",
+      "address": "2087, 24th Main Rd, Vanganahalli, 1st Sector, HSR Layout, Bengaluru, Karnataka 560102, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLc4_qI6yRnqdnUL30nGHZZxpEQMpWH292OY1qlS2THWf3ANK8Se8OKplqjr12m2JSQ03WP-VGnFfdldDLJX9VAPnLHAOjEPAicM34BLucayXv1ScTsWYkWrvG-ojQoJgOZy3ehSmhKNpMAD=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.1,
+      "rating_known": true,
+      "review_count": 385,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.912914,
+      "lng": 77.649296,
+      "tags": [
+        "heritage",
+        "nature",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nature_bugle_rock_park",
+      "osm_id": "",
+      "place_id": "ChIJmwJpvowVrjsR0JVGQxxLHms",
+      "name": "Bugle Rock Park",
+      "category": "nature",
+      "description": "A rocky park in Basavanagudi with an ancient watchtower rock, shaded paths and a local evening crowd.",
+      "address": "WHV9+3QM, Bull Temple Rd, Basavanagudi, Bengaluru, Karnataka 560004, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeFC4WuGCtp9khGhJZPOrL2-HP-V5Au1bV28FhXXhcH4kMb0Rq9PBADtIZIAtN_A4wA3jkTw3FPt15iWr-2IoKrTKAsCPRnRDmuNsNnK5IywNLd3efkAfzf9FBJ-MUmpmLhybEHxwjdpkE=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 25966,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.942705,
+      "lng": 77.569429,
+      "tags": [
+        "heritage",
+        "nature",
+        "photo",
+        "walk"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nature_cubbon",
+      "osm_id": "",
+      "place_id": "ChIJL2fQ53MWrjsRuN9D6aalLMY",
+      "name": "Cubbon Park",
+      "category": "nature",
+      "description": "Large green lung in the city centre with tree-lined walks, jogging tracks and the State Central Library.",
+      "address": "Nunegundlapalli, Ambedkar Veedhi, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeqPKpvRC4BGdXxNoK3WtFG0yXrys8wJ4stQdlaxs7u-EnIcgJbQnsdYHlqRV4igKP-Yx72CPXHyMl-Xk-E58neRnciH1xTrETmUWGEcqxKAnKIreo8IOxiG1TBizcO73KgkWUl=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 143335,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "All day, free public park",
+      "weekly_closures": [],
+      "lat": 12.975249,
+      "lng": 77.592887,
+      "tags": [
+        "nature",
+        "photo",
+        "wellness"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Flat paved paths, wheelchair-friendly entrances.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nature_hebbal_lake",
+      "osm_id": "",
+      "place_id": "ChIJBTRnZY0XrjsRA0m04B3mWjY",
+      "name": "Hebbal Lake",
+      "category": "nature",
+      "description": "A birdwatcher's lake on the northern edge of the city — herons, egrets and cormorants at first light.",
+      "address": "Hebbal Kempapura, Bengaluru, Karnataka 560092",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfQp64cYwPI97f5VG7iJ9CDMweS5mZxLXK911Za4AOB6VqUQ2j3Zp_5e11BzZ4mXr7hNPSsPAJVYHJ5PHY0x3moq-1pKlwuI1uQNFxT5uqqP7qkjmBkwQbBISjJoA8w27mwAc4=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.0,
+      "rating_known": true,
+      "review_count": 789,
+      "best_times": [
+        "early_morning",
+        "morning"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 13.046599,
+      "lng": 77.585583,
+      "tags": [
+        "nature",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nature_hesaraghatta_grasslands",
+      "osm_id": "",
+      "place_id": "ChIJcVvaXr8nrjsRdR7zlcuVUXA",
+      "name": "Hesaraghatta Grasslands",
+      "category": "nature",
+      "description": "Open grasslands and a historic reservoir north of the city, known for raptors, silence and big skies.",
+      "address": "Nrithyagram, Hesaraghatta Grass Farm, Bandayyana Palya, Karnataka 560088, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdOQn9HmWTEuNYpkr9vJdOUt2QTQG9zxURM7-g_mDhSwtSK8OVGMrGWEWsIxbrcY5GVN1UWOutMFUhebbfnc7ur2G2qhIN4cBo3hvghqrNbfX42ZAluw2lIHHxO2eoettdV2Vzn=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 522,
+      "best_times": [
+        "early_morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 13.167321,
+      "lng": 77.461692,
+      "tags": [
+        "birding",
+        "nature",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nature_lalbagh",
+      "osm_id": "",
+      "place_id": "ChIJHdPykcEVrjsRIr4v35kLEY4",
+      "name": "Lalbagh Botanical Garden",
+      "category": "nature",
+      "description": "240-acre botanical garden famous for its glasshouse flower show and 1,000+ year old trees.",
+      "address": "Mavalli, Bengaluru, Karnataka 560004, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdBpldraipJCjx16GRZJ5batrjHMgIT2CXKRsx9lO2whMBKlmlqi5scMiwmOfZI6GOZG-8UB0q_v7EPutBOS4S-3P2dIBxCN2kGoawagTbdO9lGZvdVp6YrY09WsgGv9OQIuQGydw=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 50.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 179717,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "medium",
+        "morning": "medium",
+        "afternoon": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "Open 6:00 AM - 7:00 PM",
+      "weekly_closures": [],
+      "lat": 12.949416,
+      "lng": 77.58468,
+      "tags": [
+        "nature",
+        "photo",
+        "wellness"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Paved main loop; benches and shade throughout.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_offbeat_nandi",
+      "osm_id": "",
+      "place_id": "ChIJF-r860XksTsRCGYZWSn3ORY",
+      "name": "Nandi Hills",
+      "category": "nature",
+      "description": "Early-morning hilltop famous for sunrise, with gardens and a small fort — a favourite photography trip.",
+      "address": "Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLe6A-fCp1fjT6HLg3Bwqy0ETjdZNBO33pkQOsnMXE51gDr7UHJplYTcbThUmER3ZAA-gKnTFHP-8AXmU41JamfAHICM_42T0d9dePtpPxi_YNJj5aoxj--cEAf87G2IpIGO6Mo=w1000-h1000-c-n",
+      "duration_min": 240,
+      "duration_known": true,
+      "entry_fee": 30.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 0.0,
+      "rating_known": false,
+      "review_count": 0,
+      "best_times": [
+        "early_morning",
+        "morning"
+      ],
+      "crowd": {
+        "early_morning": "medium",
+        "morning": "high",
+        "afternoon": "low"
+      },
+      "opening_hours": "Open sunrise - sunset (approx); gates manageable parking",
+      "weekly_closures": [
+        ""
+      ],
+      "lat": 13.370128,
+      "lng": 77.673655,
+      "tags": [
+        "adventure",
+        "nature",
+        "offbeat",
+        "photo"
+      ],
+      "family_friendly": true,
+      "physically_demanding": true,
+      "accessibility_notes": "Steep approach roads; long drive from city.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": false,
+        "physical_demand": true
+      }
+    },
+    {
+      "id": "bg_nature_sankey_tank",
+      "osm_id": "",
+      "place_id": "ChIJzVAUlTIWrjsRJgrhXgyf-Gs",
+      "name": "Sankey Tank",
+      "category": "nature",
+      "description": "A calm lake ringed by a 3 km walking path, popular for sunset and birdwatching in the city's north-west.",
+      "address": "Kodandarampura, Malleshwaram, Bengaluru, Karnataka 560080",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcJOAfsH6SCOzuhKIshHvT7tRXf0kNoA0ix0ARDuHlMP7tBnGT2nVbv5w4F_VJbAXVCoLLRW2vMzGAxQejp43AKb5okVPEUxjRZBiYe-WeSkrkMC-qbHSliVGNZexFWTJGj0F3UXg=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 4207,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 13.009298,
+      "lng": 77.574121,
+      "tags": [
+        "nature",
+        "photo",
+        "walk"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Level lakeside path.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nature_turahalli_forest",
+      "osm_id": "",
+      "place_id": "ChIJu3qzHyM_rjsRDY_Is59cdFw",
+      "name": "Turahalli Forest",
+      "category": "nature",
+      "description": "The last scrub forest inside Bengaluru, with a short rocky trail, boulders and a quiet sunrise viewpoint.",
+      "address": "VGFG+MVQ, Adarsha Layout, Lingadeeranahalli, Bengaluru, Karnataka 560109, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcgGG9Egy2RQ9t-7d56vuBeYBvPARXD5HAZjV1wG-cpPzQH9Ri_g0MYJw_3QJHWgjLlSGAaPN03DEZPoAaAmxCNv7-8X9TYE7lhSKiCk-qKeAIhu-U4vGgVBl35BtreEYFoJLmC=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 489,
+      "best_times": [
+        "early_morning",
+        "morning"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.874205,
+      "lng": 77.527243,
+      "tags": [
+        "adventure",
+        "nature",
+        "offbeat",
+        "photo",
+        "trek"
+      ],
+      "family_friendly": true,
+      "physically_demanding": true,
+      "accessibility_notes": "Uneven rocky trail; not suitable for strollers.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": false,
+        "physical_demand": true
+      }
+    },
+    {
+      "id": "bg_nature_ulsoor_lake",
+      "osm_id": "",
+      "place_id": "ChIJWwLHKpAWrjsRLHdwWyGN2lw",
+      "name": "Ulsoor Lake",
+      "category": "nature",
+      "description": "One of Bengaluru's oldest lakes, with a boating jetty and a shaded perimeter walk in the middle of the city.",
+      "address": "Halasuru, Sivanchetti Gardens, Bengaluru, Karnataka 560042",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfZX0eQUYqLpL7KU1F1gIPzy_wJKWGL4qJOg8KIAPUUI7tECcOYws9PQl_MTMjoeUV9mCGjkZywaqZheEhWLkfZXA7suxVPPYFGQeVBwL0h1VvcW9ZT4d8AJJSm8-hOaotG9qs6gA=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.2,
+      "rating_known": true,
+      "review_count": 4629,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "afternoon": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.983247,
+      "lng": 77.619961,
+      "tags": [
+        "nature",
+        "photo",
+        "walk"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nightlife_byg_brewski_brewing_company",
+      "osm_id": "",
+      "place_id": "ChIJY2_1IZ8ZrjsReuXcBMfC0Ws",
+      "name": "Byg Brewski Brewing Company",
+      "category": "nightlife",
+      "description": "A huge open-air brewery with a lake, live music and long tables — a full evening out.",
+      "address": "SOUTHERN ASIA BIBLE COLLEGE, 22, Hennur Bagalur Main Rd, Byrathi, Visthar, Bengaluru, Karnataka 560077, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdkXUiTNXmOudJPFQEyUOIH43KPU7sFCZY6GVpi3PbWe9Q3h7yIrjQrSGV7m726DMg6xy2kU7GUADYlZ6h_BWZTnvrpQyK8jgtaeX_2W_EcSJilBo2p0wQwORKmg-OicAZ-Z18=w1000-h1000-c-n",
+      "duration_min": 150,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 50416,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "evening": "medium",
+        "night": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 13.070775,
+      "lng": 77.652177,
+      "tags": [
+        "brewery",
+        "food",
+        "nightlife"
+      ],
+      "family_friendly": false,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": false,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nightlife_church_street",
+      "osm_id": "",
+      "place_id": "ChIJcyxyTXwWrjsRbWtDAbGepDI",
+      "name": "Church Street",
+      "category": "nightlife",
+      "description": "A leafy central street of bookshops, cafes and bars, closed to traffic on weekends.",
+      "address": "Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeWBfKRmodjXcNwh0jbN5mDuIQj7H0JdzMMVlw3jMaM1UvdnUaavrQSf1_PutdlCX4FkgYd3o9jtGAU5IvjHnfh48yesbZB13bbpV3_lHgaxDuEsHiDwKlCsZB6tdfWNipsEdY=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 0.0,
+      "rating_known": false,
+      "review_count": 0,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "evening": "medium",
+        "night": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.974364,
+      "lng": 77.607734,
+      "tags": [
+        "food",
+        "nightlife",
+        "shopping"
+      ],
+      "family_friendly": false,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": false,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_night_indiranagar",
+      "osm_id": "",
+      "place_id": "ChIJQTt4fFwUrjsRXl20ikArF0g",
+      "name": "Indiranagar 100 Feet Road",
+      "category": "nightlife",
+      "description": "Lively stretch of cafés, pubs and restaurants popular with friends and young couples.",
+      "address": "Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLddU0TGxp1jaOXLDimtlPSgA_uRBpoi-La4qpQWJN-2wHROOowlpaIif8v35YjokCNX0EPCKrbKuzZKI17u_PcmxmcaXdQKsXDRPVlM1Mba9Rglj3XKZ61nokUyRTPn-25BaaO2=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 0.0,
+      "rating_known": false,
+      "review_count": 0,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "evening": "high",
+        "night": "high"
+      },
+      "opening_hours": "Pubs/cafés evening - late (approx)",
+      "weekly_closures": [],
+      "lat": 12.950645,
+      "lng": 77.639233,
+      "tags": [
+        "food",
+        "nightlife",
+        "shopping"
+      ],
+      "family_friendly": false,
+      "physically_demanding": false,
+      "accessibility_notes": "Plenty of restaurants with accessible entrances.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": false,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_night_koramangala",
+      "osm_id": "",
+      "place_id": "ChIJY114WUUUrjsRHmPxS5kmd1I",
+      "name": "Koramangala 5th Block",
+      "category": "nightlife",
+      "description": "Food-and-nightlife hub with breweries, live-music venues and late-night dining.",
+      "address": "Koramangala, Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLd6GFKAJIT1i3qu3Sk_oXRDWe06wUDOLiN5O8IBT6U1t8SoFUbaYt9LZSxcuB3zhEtg7MFpS_gSZ1GolZfcAggPwLhJ8JSJLrHxcOOpxOuqJocjtvMyVthAT_Qyw5NVz21ptThU=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 0.0,
+      "rating_known": false,
+      "review_count": 0,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "evening": "high",
+        "night": "high"
+      },
+      "opening_hours": "Restaurants/bars evening - late (approx)",
+      "weekly_closures": [],
+      "lat": 12.935216,
+      "lng": 77.619961,
+      "tags": [
+        "food",
+        "nightlife"
+      ],
+      "family_friendly": false,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": false,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_nightlife_skyye_lounge",
+      "osm_id": "",
+      "place_id": "ChIJjfOyQ3cWrjsRz_TvsEoOQ0A",
+      "name": "Skyye Lounge",
+      "category": "nightlife",
+      "description": "A rooftop lounge on UB City's upper floors with city views and a cocktail-heavy menu.",
+      "address": "24, 16th Floor, Uber level, Canberra Block, UB City, Vittal Mallya Rd, KG Halli, D' Souza Layout, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcWnsoqwhiUEzEBTVB0cdhls8tjLvdcs6R4bK7ruGDE7KQVC1zm_h8vx_pgqb6WeYyUhWUqx6deHni71Ua7qzNcnac0j6-jw9SRyWRKWKxjxy3SqV43HGtUPLKQKyyWDmxlj8VT7_x3uhLm=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.3,
+      "rating_known": true,
+      "review_count": 9816,
+      "best_times": [
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "evening": "medium",
+        "night": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.971427,
+      "lng": 77.596508,
+      "tags": [
+        "food",
+        "nightlife",
+        "photo"
+      ],
+      "family_friendly": false,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": false,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_bull_temple",
+      "osm_id": "",
+      "place_id": "ChIJX9XqWswVrjsRRH3ymQ8yCDQ",
+      "name": "Bull Temple",
+      "category": "religious",
+      "description": "Home to a 4.5 m monolithic Nandi bull carved in the 16th century — a Basavanagudi landmark, especially during Kadalekai Parishe.",
+      "address": "Bull Temple Rd, Basavanagudi, Bengaluru, Karnataka 560004, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLc9Zto3U0GC_VgE_xPjlzLb6i0X0eFlS_rSi5SDuAFPasPa90E80JIz96CVnkgboG2_SEOIqvbfTfFMC0F7mxt6UIgw0X8T53CUIZkWtkdvPnYEl2KD_zme3vB9ss_0cwF1zSQ8IRn2_r0c=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.7,
+      "rating_known": true,
+      "review_count": 4667,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "Open 6:00 AM - 12:00 PM, 5:00 PM - 8:00 PM (approx)",
+      "weekly_closures": [],
+      "lat": 12.942031,
+      "lng": 77.568102,
+      "tags": [
+        "heritage",
+        "photo",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_dodda_ganesha_temple",
+      "osm_id": "",
+      "place_id": "ChIJNZptL6UVrjsR5F3t_I6dTdI",
+      "name": "Dodda Ganesha Temple",
+      "category": "religious",
+      "description": "A huge seated Ganesha idol beside the Bull Temple, smeared with red kumkuma and busy on weekends.",
+      "address": "Bull Temple Rd, Basavanagudi, Bengaluru, Karnataka 560004, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcWNtUp4JWWl5iIzfqE8N34FIgbM6z0vZJZpbzrFizntMz6fpO-f8viafqb6ckaVWbYOLdU_6heo309oGHDwbSaPo5M8WwZ8lt3cLWUYcmjuA2w-aDAwSUJfUTMpu8_IF0SmymT-bTLs30=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.8,
+      "rating_known": true,
+      "review_count": 2512,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.942958,
+      "lng": 77.568067,
+      "tags": [
+        "heritage",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_iskcon_bengaluru",
+      "osm_id": "",
+      "place_id": "ChIJBw42C-09rjsRs7KmQUqyf3o",
+      "name": "ISKCON Bengaluru",
+      "category": "religious",
+      "description": "A hilltop Krishna temple complex with a grand hall, rooftop views and an evening aarti worth timing a visit for.",
+      "address": "Hare Krishna Hill, Chord Rd, 1st R Block, Rajajinagar, Bengaluru, Karnataka 560010, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLe4ZHkoKlGr3lldP3A4rYYZEjc652n_VJaBFmqLL72cezV2mCFRFwLA_LCZ-nqlRKytLsFb__jG5aYoQy_eZNuaYcCNRBRsYQLGGX_VA1jHXQ1n-qmwm7SjY3hV7Ckg3HUnltIfIw=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.7,
+      "rating_known": true,
+      "review_count": 144581,
+      "best_times": [
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "Open ~4:15 AM - 9:00 PM daily",
+      "weekly_closures": [],
+      "lat": 13.009626,
+      "lng": 77.551098,
+      "tags": [
+        "heritage",
+        "photo",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "Temple has ramps and lifts.",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_infant_jesus_church",
+      "osm_id": "",
+      "place_id": "ChIJlTBafjoUrjsRc99a3-6HCY4",
+      "name": "Infant Jesus Church",
+      "category": "religious",
+      "description": "One of Bengaluru's most visited churches, known for its votive offerings and Thursday novena crowds.",
+      "address": "INFANT JESUS CHURCH, 4712, Bazaar St, Rose Garden, Vannarpet Layout, Vivek Nagar, Bengaluru, Karnataka 560047, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfjPLBSnugQCCjRNbasPSTtAaPP_VL5uJWYzyj-iNsq59TVz-aoZZSaq5B0x-BMpQyXRqRA0SuqJXcMmLbcF4o49UOalP4kGFTJcH_5c9w5sL51ye1bq3IOfAWCZD9r0YLX_oTh0eRz4VN_=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.7,
+      "rating_known": true,
+      "review_count": 14610,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.953673,
+      "lng": 77.618768,
+      "tags": [
+        "heritage",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_kadu_malleshwara_temple",
+      "osm_id": "",
+      "place_id": "ChIJ8zKjiD_SsTsRWyTb-brtw-0",
+      "name": "Kadu Malleshwara Temple",
+      "category": "religious",
+      "description": "A 17th-century Shiva temple in Malleshwaram, the anchor of the old neighbourhood's temple street.",
+      "address": "Vyalikaval, Kodandarampura, Malleshwaram, Bengaluru, Karnataka 560003, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLev0Pj8-K2XmNXGF6y1ERwqJDCJJuMdJc-2uT0wejI-X_RfWdgEzKEW2Cj37hrTgwtTZ1_O11cZzt4Fk6c-n53a7TQrmS4MCQamk9r9mBc54hW-LoOL22lBybNeNSS6yDi8T1YjOA=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.8,
+      "rating_known": true,
+      "review_count": 8466,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 13.005003,
+      "lng": 77.571506,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_someshwara_temple_halasuru",
+      "osm_id": "",
+      "place_id": "ChIJfR306JsWrjsREJCyldyPh4c",
+      "name": "Someshwara Temple, Halasuru",
+      "category": "religious",
+      "description": "A Chola-era Shiva temple with intricate granite pillars and a quiet courtyard hidden behind Ulsoor's markets.",
+      "address": "Sri, Someshwara Temple Rd, Halasuru, Someshwarpura, Bengaluru, Karnataka 560008, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeSrMOQiyCS90OstIM3-5HKGuv_rj15rGNUlB6YOXo1ARy8ptEIftpWZLVaHNuW-GN1i_PkJQhZmFkkro_D9SjGf4rrWw1Wl6MNM1tLYEO_ap4dz7ZDtWNV6_e4UlrM20Kg-wYo43W7f1Dd=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.7,
+      "rating_known": true,
+      "review_count": 13218,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.975553,
+      "lng": 77.623947,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "photo",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_mary",
+      "osm_id": "",
+      "place_id": "ChIJ8VNf1mMWrjsRwsMEl564ksQ",
+      "name": "St. Mary's Basilica",
+      "category": "religious",
+      "description": "One of India's oldest churches, hosting the grand annual St. Mary's feast in Shivajinagar.",
+      "address": "XJM3+QQ3, MF Norrona St, Shivaji Nagar, Bengaluru, Karnataka 560051, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeg1CyQfvMJ4zoBFECnMFVbSGah5Jc9ADbnN-HcrNkJUOrsA6xfRusCNaz_10ITqCIlFbdt65hRi_xBjo7w5DsFqjGIORXRv-wu_uVgidNWWADyxFo1AuSXLgzZbqSN1rPelcvUSg=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.6,
+      "rating_known": true,
+      "review_count": 18249,
+      "best_times": [
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "low",
+        "evening": "medium"
+      },
+      "opening_hours": "Open ~5:30 AM - 8:00 PM (approx)",
+      "weekly_closures": [],
+      "lat": 12.984393,
+      "lng": 77.604419,
+      "tags": [
+        "heritage",
+        "photo",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_religious_tawakkal_mastan_dargah",
+      "osm_id": "",
+      "place_id": "ChIJGXFZxwUWrjsRS9wEo62Ti98",
+      "name": "Tawakkal Mastan Dargah",
+      "category": "religious",
+      "description": "A 17th-century Sufi dargah in Cottonpet, visited across faiths and especially during the Karaga procession.",
+      "address": "Akkipete Main Road, O.T.C. Road Chickpete, Upparpete, Cottonpete, Bengaluru, Karnataka 560053, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLeEvhw6uybWc72qJ1AkkGvO016Uk_RbVriJDbXaDqk9td5b2JW42Y_wAX-_QodEJXP7ACpGtwnTJIfjAWNuwJvsnKwDJF9q7bMPOWpQrlFUXq_ubhSMOnFjHH8A1dMMemTQTu5U=w1000-h1000-c-n",
+      "duration_min": 30,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.8,
+      "rating_known": true,
+      "review_count": 3069,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "high",
+        "evening": "medium"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.973176,
+      "lng": 77.571571,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "religious"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shopping_avenue_road",
+      "osm_id": "",
+      "place_id": "ChIJNRNfhwkWrjsRST9JnrSomi4",
+      "name": "Avenue Road",
+      "category": "shopping",
+      "description": "A busy old-city lane for books, brassware, temple supplies and second-hand treasures.",
+      "address": "Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfmtGUtiVjehZmFk32_RfgT-9nVT_v_N7NA7WwVdxXqZWx8TBmhxot_8s0eA4dq6WcNzKgNgLoCYWjSKuX1ZumA56hVBRxJLzsG5mRJAte8GPDI-tJcsxngyo4DlKPlSmwYFhb1owinuwc=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.2,
+      "rating_known": true,
+      "review_count": 1077,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.968609,
+      "lng": 77.57904,
+      "tags": [
+        "heritage",
+        "offbeat",
+        "photo",
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shopping_brigade_road",
+      "osm_id": "",
+      "place_id": "ChIJFWfzXNUVrjsR3YB7Mo3GyWc",
+      "name": "Brigade Road",
+      "category": "shopping",
+      "description": "A central shopping stretch linking MG Road and Residency Road, good for brands, cafes and people-watching.",
+      "address": "Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLc68SgwDYQ73DrklpePZdNVSiOf86L_uN9uWKSyG6_dH1HPXW_rHphZnXqegDY1pEqi1soTjqS7apin267rQ1_8P0FtBHNnosSKOSteTkuJ-B0nYvvj7TGouIi44nVVFr3Ru34JWg=w1000-h1000-c-n",
+      "duration_min": 60,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 0.0,
+      "rating_known": false,
+      "review_count": 0,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.971043,
+      "lng": 77.606903,
+      "tags": [
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shopping_cauvery_handicrafts_emporium",
+      "osm_id": "",
+      "place_id": "ChIJgTypLpQXrjsR7Qecpfih4io",
+      "name": "Cauvery Handicrafts Emporium",
+      "category": "shopping",
+      "description": "A Karnataka government emporium for sandalwood, silk, rosewood and handmade souvenirs.",
+      "address": "45, Mahatma Gandhi Rd, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdRMDnJzHLBk0bFJ3N2UIhOWZ7g1dfkIb8vgdp_iKCd0xkHj85syIDG8ovVbli4pDV_rG0mjt1DN1IRQGJR1pSX03Z0QO_65ta4cDrlvj0Pxrskg_1U7gy0IG7pKmPtk-shXZ7Z=w1000-h1000-c-n",
+      "duration_min": 45,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.3,
+      "rating_known": true,
+      "review_count": 6124,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.974805,
+      "lng": 77.608053,
+      "tags": [
+        "heritage",
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shop_chickpete",
+      "osm_id": "",
+      "place_id": "ChIJ9R1DhwkWrjsR4TN_tr8Y80U",
+      "name": "Chickpete & K.R. Market",
+      "category": "shopping",
+      "description": "Heritage wholesale market district best known for fresh produce, flowers and fabric lanes.",
+      "address": "Huriopet, Chickpet, Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfWiQyJX-0eesXvWByw9p57lBpE8YzWFj0iG-fRfu3q09mmPLMcfM7WIMLv9zOmDzQZVx9f4pYzBUL9qZH9r_aH_RPVDYFh70HVHM17g9XHcQQncickhIZPAIzbWdeUTKu_bj4=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 0.0,
+      "rating_known": false,
+      "review_count": 0,
+      "best_times": [
+        "early_morning",
+        "morning"
+      ],
+      "crowd": {
+        "early_morning": "medium",
+        "morning": "high",
+        "afternoon": "medium"
+      },
+      "opening_hours": "Market early morning - evening (approx)",
+      "weekly_closures": [],
+      "lat": 12.965639,
+      "lng": 77.576987,
+      "tags": [
+        "offbeat",
+        "photo",
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shop_commercial",
+      "osm_id": "",
+      "place_id": "ChIJbcFO0okWrjsRfRCaFtIVXbk",
+      "name": "Commercial Street",
+      "category": "shopping",
+      "description": "Bustling bazaar street for clothes, jewellery, electronics and street food.",
+      "address": "Tasker Town, Shivaji Nagar, Bengaluru, Karnataka, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfO3o6xyUEpj_EbULGw57FZYISX6hoxlo_chALS4_XCu-QqvOrsFpIfq5rKhgcHE356wejUQADo7uao8eXHAhCrquIWehuqP1TrU9T0iGstIOu5Nr1ugu5xNe8TJJOD-CHipOi4=w1000-h1000-c-n",
+      "duration_min": 150,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.4,
+      "rating_known": true,
+      "review_count": 6137,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "medium",
+        "afternoon": "high",
+        "evening": "high"
+      },
+      "opening_hours": "Most shops 10 AM - 9 PM",
+      "weekly_closures": [],
+      "lat": 12.982236,
+      "lng": 77.608373,
+      "tags": [
+        "food",
+        "photo",
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shopping_forum_mall_koramangala",
+      "osm_id": "",
+      "place_id": "ChIJ5cShhU0UrjsRz8wq-4Bi56E",
+      "name": "Forum Mall Koramangala",
+      "category": "shopping",
+      "description": "The original Koramangala mall, still a convenient stop for shopping and a movie.",
+      "address": "Hosur Rd, Chikku Lakshmaiah Layout, Koramangala, Bengaluru, Karnataka 560030, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdXWpkGbdre5jrVf0gQ8KSk9qFStIoOiexGCVJnFlzryrbXz9OORa_y7ZSYE7htyz4HyJpmpyi8CCl2kffDa2QQe-h-foB2AkcI5hjQoTme7UlWQrT7swKzDIaFZy04irg1gBpIng=w1000-h1000-c-n",
+      "duration_min": 90,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 0.0,
+      "rating_known": false,
+      "review_count": 0,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.934619,
+      "lng": 77.611188,
+      "tags": [
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shopping_orion_mall",
+      "osm_id": "",
+      "place_id": "ChIJZ0FegEs9rjsRZFR-C-hVwqQ",
+      "name": "Orion Mall",
+      "category": "shopping",
+      "description": "A big north-Bengaluru mall beside Sankey Tank, with brands, cinema and lakeside dining.",
+      "address": "Dr Rajkumar Rd, Rajajinagar, Bengaluru, Karnataka 560055, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfwEq63wP8XzsX_8_sKCpgo4khk58CKqN2nxE-5SH-aloGH5TvYLjuCfXipeFpf53zs6mHtwspkCgzNEaoatFCzt0Z9YJbh-8KxypbuQvctV1-mcnHe0WXotthdkIdOF79x7l7OhBJ58UpO=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 198342,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 13.011023,
+      "lng": 77.554715,
+      "tags": [
+        "family",
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shopping_phoenix_marketcity",
+      "osm_id": "",
+      "place_id": "ChIJS76jBAsRrjsRQ5Yuqy0l-88",
+      "name": "Phoenix Marketcity",
+      "category": "shopping",
+      "description": "A large Whitefield mall with international brands, a food court and a multiplex.",
+      "address": "ITPL Main Rd, Devasandra Industrial Estate, Mahadevapura, Bengaluru, Karnataka 560048, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfQy9uMzZgbyBTR9_VG1M-MLzwZFtg0VBiQJ1vIJqq6VF11hT2JF3_n6566x-Ai8XCUHTAo6iHprQFk-V2Z8o88wCR2yJHJCYUX6nqn94vpz6PkHnCRD9nGUphMcItaMVTE1MpXHQ=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 189860,
+      "best_times": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "crowd": {
+        "morning": "low",
+        "afternoon": "medium",
+        "evening": "high"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.996954,
+      "lng": 77.696554,
+      "tags": [
+        "family",
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_shop_ubcity",
+      "osm_id": "",
+      "place_id": "ChIJ96tpUHcWrjsRit-gsot2OOE",
+      "name": "UB City Mall",
+      "category": "shopping",
+      "description": "Luxury retail and upscale dining complex on Vittal Mallya Road with contemporary art spaces.",
+      "address": "24, Vittal Mallya Rd, KG Halli, D' Souza Layout, Ashok Nagar, Bengaluru, Karnataka 560001, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLfZUV7sLCoGs-4TnHzmqcuW-x1dktBHWcsKU2g5lqZS3Qx6Dm4I9jzS0td8mmOI14MUptTh2zgtLkYzUcKMT_RclOlo-7tqWkRlEBesw0V8DBTN7nL71XD-crZdeBavE7P37lcWtOGNBS0S=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 69415,
+      "best_times": [
+        "afternoon",
+        "evening",
+        "night"
+      ],
+      "crowd": {
+        "afternoon": "medium",
+        "evening": "high",
+        "night": "medium"
+      },
+      "opening_hours": "Mall ~10 AM - 11 PM",
+      "weekly_closures": [],
+      "lat": 12.971643,
+      "lng": 77.595937,
+      "tags": [
+        "food",
+        "nightlife",
+        "shopping"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_wellness_aol",
+      "osm_id": "",
+      "place_id": "ChIJCbgrlqpBrjsRK09XN89u3Fc",
+      "name": "Art of Living International Centre",
+      "category": "wellness",
+      "description": "Peaceful ashram campus on the Kanakapura road with gardens, meditation halls and dining.",
+      "address": "21KM, Kanakapura Main Rd, Udayapura Post, South, Agara, Karnataka 560082, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLcQ3ZBRFt8fktaBluDg-z_xC33OHxsL2wppmrOZbBKF4WvVekInnn3VbWYAl-LXW06tWeuC9wwRxW-2-_hoDK6kstSp35DoTB1uOgdHKv-KYP0pfKUEosSyoy-zIiYoC5OimGY=w1000-h1000-c-n",
+      "duration_min": 150,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": true,
+      "rating": 4.6,
+      "rating_known": true,
+      "review_count": 28109,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "medium",
+        "evening": "medium"
+      },
+      "opening_hours": "Campus open daytime; grand meditation dome (approx)",
+      "weekly_closures": [],
+      "lat": 12.828672,
+      "lng": 77.512115,
+      "tags": [
+        "nature",
+        "religious",
+        "wellness"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_wellness_ayurveda_gram",
+      "osm_id": "",
+      "place_id": "ChIJVVVVVfkNrjsR8zeW1BWzczE",
+      "name": "Ayurveda Gram",
+      "category": "wellness",
+      "description": "A wellness retreat on the city's edge offering Ayurvedic consultations, treatments and a peaceful campus.",
+      "address": "Post, Hemandanahalli, Whitefield, Samethanahalli, Bengaluru, Karnataka 560067, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdbj4Ezc7grpo2ECSa-ZTmyXzvOZTVJh0x0VTH-Pcr_C4Ue5V9QHgVINRs4kzZXkAee2slEKORcU-ES4jMSiO76CyTqDzeMtpi_0shdaCvVBG1vVj3mOtv0ZRHOERwuy6XAJrA=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.6,
+      "rating_known": true,
+      "review_count": 239,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "low",
+        "evening": "low"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.9697,
+      "lng": 77.800089,
+      "tags": [
+        "nature",
+        "wellness"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    },
+    {
+      "id": "bg_wellness_pyramid_valley_international",
+      "osm_id": "",
+      "place_id": "ChIJj9SJMd5DrjsR12RVhqwazng",
+      "name": "Pyramid Valley International",
+      "category": "wellness",
+      "description": "A meditation campus near Harohalli built around a large granite pyramid, with quiet gardens and vegetarian food.",
+      "address": "Kanakapura Main Rd, Bengaluru, Harohalli, Karnataka 562112, India",
+      "photo_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLdzSyTF5Kt-ZdQG0K7Q0kizFfOxiaQ0x_UcwmTwCfVWps-_95D2vhEhyRkoFKW2m1PsptPTdnvPSLpz7QVVzxQukvZiZlHqpcV6nTU-N0EILKkLrRw4Gm-Muf_2TKm5TraTjla11n3Xu2AD=w1000-h1000-c-n",
+      "duration_min": 120,
+      "duration_known": true,
+      "entry_fee": 0.0,
+      "entry_fee_child": null,
+      "entry_fee_known": false,
+      "rating": 4.5,
+      "rating_known": true,
+      "review_count": 12029,
+      "best_times": [
+        "early_morning",
+        "morning",
+        "evening"
+      ],
+      "crowd": {
+        "early_morning": "low",
+        "morning": "low",
+        "evening": "low"
+      },
+      "opening_hours": "",
+      "weekly_closures": [],
+      "lat": 12.697207,
+      "lng": 77.495021,
+      "tags": [
+        "offbeat",
+        "photo",
+        "wellness"
+      ],
+      "family_friendly": true,
+      "physically_demanding": false,
+      "accessibility_notes": "",
+      "destination": "bengaluru",
+      "data_source": "curated",
+      "data_is_estimated": true,
+      "verified": true,
+      "suitability": {
+        "family_kids": true,
+        "seniors": true,
+        "physical_demand": false
+      }
+    }
+  ]
+}

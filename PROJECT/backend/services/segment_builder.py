@@ -51,10 +51,21 @@ MAX_METRO_TRANSFER = 2      # long-haul bus->metro interchange rides offered
 MAX_ANCHORS_SEG2 = 6
 MAX_SEG2_OPTIONS = 40
 MAX_PROBES = 6
+# A ride whose next bus is farther out than this is never the headline
+# recommendation while a catchable ride exists (2026-10-15: a bus departing in
+# 133 min was being recommended over one leaving in 8 min).
+MAX_TOP_WAIT_MIN = 30
 CACHE_TTL_S = 300         # 5 min segments cache (PROMPT_3 §5)
 
 WALK_OPTION_MAX_M = 2000   # walk option always present for any stop <= 2km
 WALK_PRIMARY_M = 1500      # distance <= 1.5km -> WALK is primary (no cab/bike)
+# FINAL LEG (2026-10-15): when the anchor is this close to the destination the
+# remaining distance is a walk the user would obviously do, so it is offered as
+# a real walk-to-destination hop instead of forcing another bus leg.
+FINAL_WALK_MAX_M = 2200
+# A ride that lands this close to the destination is "reaches the destination"
+# — worth flagging so the UI can say the bus goes all the way.
+NEAR_DEST_REACH_M = 1500
 
 # Hop spacing: each bus leg must make REAL progress toward the destination.
 # Before 2026-08-03 the builder only offered the first 3 stops of a route —
@@ -74,12 +85,25 @@ def _fmt(minutes: int) -> str:
 
 
 def _parse_current_time(iso: str | None):
+    """Request `current_time` -> (minutes since midnight, iso string).
+
+    Accepts a full ISO datetime ("2026-07-31T15:20:00+05:30") and a bare clock
+    time ("15:20" / "15:20:00"). A time-only string used to fall through to the
+    wall clock silently, so a caller asking for 09:00 got "no buses after 22:00"
+    and night-time options.
+    """
     if iso:
         try:
             dt = datetime.fromisoformat(iso)
             return dt.hour * 60 + dt.minute, iso
         except (ValueError, TypeError):
             pass
+        for fmt in ("%H:%M:%S", "%H:%M"):
+            try:
+                t = datetime.strptime(iso, fmt)
+                return t.hour * 60 + t.minute, f"{t.hour:02d}:{t.minute:02d}"
+            except (ValueError, TypeError):
+                continue
     now = datetime.now().astimezone()
     return now.hour * 60 + now.minute, now.isoformat()
 
@@ -170,6 +194,7 @@ class SegmentBuilder:
             dest_lat=dest["lat"], dest_lng=dest["lng"],
             now_min=now_min, group_size=group_size, budget=budget,
             seg_num=len(chosen_legs) + 1, connected_from=stop_name,
+            dest_name=dest.get("name", ""),
             visited={self._chosen_stop_key(c) for c in chosen_legs},
         )
         probes = self._probes_for_segment(seg, dest, group_size, budget)
@@ -195,6 +220,8 @@ class SegmentBuilder:
         options.extend(self._transit_options(
             source["lat"], source["lng"], destination["lat"], destination["lng"],
             now_min, group_size, budget, connected_from=None, seg_num=1))
+        self._add_final_walk(options, source, destination, now_min,
+                             connected_from=None, seg_num=1)
 
         for opt in options:
             self._fill_transit_count(opt, now_min)
@@ -257,11 +284,13 @@ class SegmentBuilder:
         options.extend(self._transit_options(
             stop["lat"], stop["lng"], destination["lat"], destination["lng"],
             now_min, group_size, budget, connected_from=connected_from, seg_num=seg_num))
+        self._add_final_walk(options, stop, destination, now_min,
+                             connected_from=connected_from, seg_num=seg_num)
         return options
 
     def _build_segment_from_anchor(self, anchor_lat, anchor_lng, anchor_name,
                                    dest_lat, dest_lng, now_min, group_size,
-                                   budget, seg_num, connected_from,
+                                   budget, seg_num, connected_from, dest_name: str = "",
                                    visited: set | None = None) -> dict:
         anchor_pt = {"name": anchor_name, "lat": anchor_lat, "lng": anchor_lng}
         # BUG1 #1: if we are already effectively AT the destination, there are no
@@ -289,6 +318,11 @@ class SegmentBuilder:
             opts = [o for o in opts
                     if (o.get("destinationStop") or {}).get("name", "").strip().lower()
                     not in visited]
+        # the walkable final leg is added after the circling filter: ending the
+        # journey by walking to the destination is never "circling back"
+        self._add_final_walk(opts, anchor_pt, {"name": dest_name, "lat": dest_lat,
+                                              "lng": dest_lng},
+                             now_min, connected_from=connected_from, seg_num=seg_num)
         for opt in opts:
             self._fill_transit_count(opt, now_min)
         self._mark_top_recommended(opts, now_min, cand[:3] if walk_shown else None,
@@ -334,6 +368,48 @@ class SegmentBuilder:
             counts[c["kind"]] += 1
             capped.append(c)
         return capped
+
+    # -------------------------------------------------- final walk to the dest
+    def _add_final_walk(self, options: list[dict], from_pt, destination: dict,
+                        now_min: int, connected_from, seg_num: int) -> None:
+        """Offer the walkable last leg to the destination (2026-10-15).
+
+        Before this, the journey simply ended when an arrival stop happened to sit
+        within ARRIVED_DEST_M of the destination — the user never saw how the last
+        400 m-2 km was covered, and a stop 600 m away offered no way to finish on
+        foot. A real walk leg is emitted (GraphHopper geometry when available) so
+        the tree/chip/breadcrumb show "walk N min to <destination>".
+        """
+        name = destination.get("name") or "Destination"
+        remaining = _hav(from_pt["lat"], from_pt["lng"],
+                         destination["lat"], destination["lng"])
+        if remaining <= 20 or remaining > FINAL_WALK_MAX_M:
+            return  # already there, or too far to walk the whole way
+        duration = max(1, int(round(remaining / (WALK_SPEED_KMH * 1000) * 60)))
+        geometry, geo_src = self._walk_geometry(from_pt, destination)
+        arrival_min = now_min + duration
+        options.append({
+            "optionId": f"s{seg_num}_walk_dest_{self._slug(name)}",
+            "destinationStop": {"name": name, "lat": destination["lat"],
+                                "lng": destination["lng"]},
+            "mode": "walk", "routeNumber": None,
+            "fromStop": from_pt.get("name") if isinstance(from_pt, dict) else str(from_pt),
+            "distanceKm": round(remaining / 1000.0, 2),
+            "durationMin": duration,
+            "departureTime": "Now",
+            "arrivalTime": _fmt(arrival_min),
+            "arrivalMin": arrival_min,
+            "fare": 0.0, "perPersonFare": 0.0,
+            "geometry": geometry, "geometrySource": geo_src,
+            "_pathLabel": "estimated" if geo_src == "interpolated" else "exact",
+            "status": "estimated",
+            "isTopRecommended": False,
+            "isFinalWalk": True,
+            "connectedFrom": connected_from,
+            "transitOptionsFromThisStop": 0,
+            "probeNext": [],
+            "exceedsBudget": False,
+        })
 
     # ------------------------------------------------------------ walk
     def _walk_option(self, from_pt, cand: dict, now_min, group_size, budget,
@@ -397,11 +473,8 @@ class SegmentBuilder:
                                        group_size, budget, connected_from, seg_num):
                 opt["_walkToBoard"] = walk_to_board
                 opt["_fromLat"], opt["_fromLng"] = board_node.lat, board_node.lng
-                opt["accessWalk"] = {
-                    "stopName": board_node.name, "lat": board_node.lat, "lng": board_node.lng,
-                    "durationMin": walk_to_board,
-                    "distanceKm": round(board_dist / 1000.0, 2),
-                }
+                opt["accessWalk"] = self._access_walk(board_node, board_dist,
+                                                      walk_to_board, connected_from)
                 options.append(opt)
 
         metro_board = self.graph.metro_nodes_near(lat, lng, METRO_CAND_RADIUS_M)[:MAX_BOARD_METRO]
@@ -415,11 +488,8 @@ class SegmentBuilder:
                                           group_size, budget, connected_from, seg_num):
                 mopt["_walkToBoard"] = walk_to_board
                 mopt["_fromLat"], mopt["_fromLng"] = station_node.lat, station_node.lng
-                mopt["accessWalk"] = {
-                    "stopName": station_node.name, "lat": station_node.lat, "lng": station_node.lng,
-                    "durationMin": walk_to_board,
-                    "distanceKm": round(station_dist / 1000.0, 2),
-                }
+                mopt["accessWalk"] = self._access_walk(station_node, station_dist,
+                                                       walk_to_board, connected_from)
                 options.append(mopt)
 
         # dedupe by (mode, route, destStop)
@@ -433,6 +503,26 @@ class SegmentBuilder:
             deduped.append(o)
         return deduped
 
+    @staticmethod
+    def _access_walk(board_node, board_dist: float, walk_to_board: int,
+                     connected_from) -> dict:
+        """The walk that gets you onto this ride.
+
+        `isTransferWalk` marks the walk between two stops (you got off one bus and
+        are walking to the next boarding stop) versus the walk out of your origin.
+        The hop tree needs that to render the middle "walk" leg the journey used to
+        hide (2026-10-15).
+        """
+        walk = {
+            "stopName": board_node.name, "lat": board_node.lat, "lng": board_node.lng,
+            "durationMin": walk_to_board,
+            "distanceKm": round(board_dist / 1000.0, 2),
+            "isTransferWalk": bool(connected_from),
+        }
+        if connected_from:
+            walk["fromStop"] = connected_from
+        return walk
+
     def _bus_rides(self, board_node, board_after, dest_lat, dest_lng, group_size,
                    budget, connected_from, seg_num) -> list[dict]:
         """Real GTFS departures from the boarding stop, riding to forward stops."""
@@ -440,6 +530,10 @@ class SegmentBuilder:
 
         dep = self.gtfs.earliest_departures(board_node.name, _fmt(board_after),
                                             max_n=12, window_min=DEP_WINDOW_MIN)
+        # A departure returned by the windowed scan IS real service. Only when the
+        # scan finds nothing (and we fall back to the raw stop timetable) is the
+        # stop genuinely without a bus in the next DEP_WINDOW_MIN minutes.
+        in_service_window = bool(dep)
         if not dep:
             dep = self.gtfs.get_routes_at_stop(board_node.name, _fmt(board_after))
         # distinct routes first, keep the earliest per route
@@ -452,8 +546,11 @@ class SegmentBuilder:
 
         out: list[dict] = []
         for d in routes:
-            # departures farther than MAX_WAIT from the anchor are not live
-            not_running = (d.departure_minutes - board_after) > MAX_WAIT_MIN
+            # "not_running" used to mean "next bus is >MAX_WAIT away", which
+            # mislabelled a real 09:13 stop as "no more scheduled buses today"
+            # when its next bus was 58 min out. It now means what it says: no
+            # scheduled service for this stop inside the scan window.
+            not_running = not in_service_window
             # walk along the route shape in the direction that heads toward dest
             forward = self._route_forward_stops(d.route_number, board_node.name,
                                                 dest_lat, dest_lng)
@@ -462,7 +559,7 @@ class SegmentBuilder:
             for fwd in self._spaced_arrival_stops(board_node, forward, dest_lat, dest_lng):
                 opt = self._bus_ride_option(board_node, d, fwd, dest_lat, dest_lng,
                                             group_size, budget, connected_from, seg_num,
-                                            not_running=not_running)
+                                            not_running=not_running, board_after=board_after)
                 if opt:
                     out.append(opt)
         # long-haul bus -> metro interchange rides (checked over ALL routes, not
@@ -474,7 +571,7 @@ class SegmentBuilder:
         for d in all_routes:
             if transfer_added >= MAX_METRO_TRANSFER:
                 break
-            not_running = (d.departure_minutes - board_after) > MAX_WAIT_MIN
+            not_running = not in_service_window
             forward = self._route_forward_stops(d.route_number, board_node.name,
                                                 dest_lat, dest_lng)
             transfer = self._metro_transfer_stop(forward, board_node, dest_lat, dest_lng)
@@ -491,7 +588,7 @@ class SegmentBuilder:
                     continue
                 opt = self._bus_ride_option(board_node, d, transfer, dest_lat, dest_lng,
                                             group_size, budget, connected_from, seg_num,
-                                            not_running=not_running)
+                                            not_running=not_running, board_after=board_after)
                 if opt:
                     opt["isMetroTransfer"] = True
                     out.append(opt)
@@ -561,15 +658,23 @@ class SegmentBuilder:
 
     def _bus_ride_option(self, board_node, dep, fwd, dest_lat, dest_lng,
                          group_size, budget, connected_from, seg_num,
-                         not_running: bool = False) -> dict | None:
+                         not_running: bool = False, board_after: int | None = None) -> dict | None:
         """One bus ride: depart board_node on dep.route_number, get off at fwd stop."""
         from .fare_engine import bmtc_fare, bus_route_class, kia_fare
 
         dest_stop, dlat, dlng = fwd[0], fwd[1], fwd[2]
         wait = dep.departure_minutes
+        wait_min = (max(0, int(round(wait - board_after)))
+                    if board_after is not None else 0)
         # ride duration via graph edges between board and dest (same route)
         duration, dist_m = self._route_ride_duration(board_node.name, dest_stop,
                                                      dep.route_number)
+        # A ride the route shape cannot resolve between the two stops (loop
+        # shapes / a stop the shape lists without geometry) came out as a
+        # "0.0 km, 1 min" hop with a straight-line geometry — a fake leg. The
+        # data layer has no real distance for it, so the hop is not offered.
+        if dist_m <= 0:
+            return None
         arrive = wait + duration
         status = "not_running" if not_running else "scheduled"
 
@@ -595,6 +700,8 @@ class SegmentBuilder:
             "departureTime": _fmt(wait),
             "arrivalTime": _fmt(arrive),
             "arrivalMin": arrive,
+            "waitMin": wait_min,                       # real wait at the stop
+            "longWait": status == "scheduled" and wait_min > MAX_WAIT_MIN,
             "fare": round(fare, 2), "perPersonFare": round(pp, 2),
             "geometry": geometry, "geometrySource": geo_src,
             "_pathLabel": "estimated" if geo_src == "interpolated" else "exact",
@@ -605,6 +712,10 @@ class SegmentBuilder:
             "probeNext": [],
             "isMetroTransfer": False,
             "exceedsBudget": exceeds,
+            # this ride ends within a short walk of the destination — riding it
+            # all the way beats breaking the trip into more hops
+            "reachesNearDestination": _hav(dlat, dlng, dest_lat, dest_lng) <= NEAR_DEST_REACH_M,
+            "remainingToDestKm": round(_hav(dlat, dlng, dest_lat, dest_lng) / 1000.0, 2),
         }
 
     def _metro_rides(self, station_node, board_after, dest_lat, dest_lng, group_size,
@@ -631,6 +742,7 @@ class SegmentBuilder:
                                   "purple" if "Purple" in line else "green").amount or 0.0
                 total = fare * max(1, group_size)
                 geo = self._metro_polyline(path)
+                remaining = _hav(dlat, dlng, dest_lat, dest_lng)
                 out.append({
                     "optionId": f"s{seg_num}_metro_{self._slug(dest_station)}",
                     "destinationStop": {"name": dest_station, "lat": dlat, "lng": dlng},
@@ -641,6 +753,10 @@ class SegmentBuilder:
                     "departureTime": _fmt(depart),
                     "arrivalTime": _fmt(arrive),
                     "arrivalMin": arrive,
+                    # BMRCL has no GTFS schedule here — the platform wait is the
+                    # documented average headway, labelled as estimated
+                    "waitMin": METRO_HEADWAY_MIN,
+                    "longWait": False,
                     "fare": round(fare, 2), "perPersonFare": round(fare, 2),
                     "geometry": geo, "geometrySource": "metro_line",
                     "status": "estimated",
@@ -649,6 +765,8 @@ class SegmentBuilder:
                     "transitOptionsFromThisStop": 0,
                     "probeNext": [],
                     "exceedsBudget": total > budget and fare > 0,
+                    "reachesNearDestination": remaining <= NEAR_DEST_REACH_M,
+                    "remainingToDestKm": round(remaining / 1000.0, 2),
                 })
         return out
 
@@ -827,6 +945,12 @@ class SegmentBuilder:
                               dest_lat: float, dest_lng: float) -> None:
         if not options:
             return
+        # rule: a walkable final leg to the destination IS the most useful action —
+        # take it ahead of any other option (you would just walk the last bit).
+        final_walk = next((o for o in options if o.get("isFinalWalk")), None)
+        if final_walk and (final_walk.get("distanceKm") or 0) * 1000 <= WALK_PRIMARY_M:
+            final_walk["isTopRecommended"] = True
+            return
         # rule: a walk is THE top only when it actually lands you near the destination
         # (short final leg). For a long journey, walking to an adjacent stop is NOT
         # the actionable recommendation — let a transit hop win (§20 #38).
@@ -842,13 +966,21 @@ class SegmentBuilder:
                         return
         # long journey: prefer the hop that makes the most progress toward the
         # destination (reaches the farthest), tie-broken by cost/arrival/walk.
+        # A ride that lands near the destination always beats a ride that stops
+        # short — riding the same bus further is better than a bigger detour.
         transit = [o for o in options if o["mode"] in ("bus", "metro", "train")]
         if transit:
             def progress(o):
                 ds = o.get("destinationStop") or {}
                 rem = _hav(ds.get("lat", 0), ds.get("lng", 0), dest_lat, dest_lng)
                 return (rem, (o.get("fare") or 0) * 2 + (o.get("arrivalMin") or now_min))
-            best = min(transit, key=progress)
+
+            # recommend only what the user can actually board now: dropping the
+            # long-wait options first keeps the suggestion actionable
+            catchable = [o for o in transit
+                         if o.get("status") != "not_running"
+                         and (o.get("waitMin") or 0) <= MAX_TOP_WAIT_MIN]
+            best = min(catchable or transit, key=progress)
         else:
             def score(o):
                 walk_km = o["distanceKm"] if o["mode"] == "walk" else 0.0
@@ -936,7 +1068,12 @@ class SegmentBuilder:
             warnings.append("Bus service limited after 22:00 - consider cab/auto")
         not_running = any(o.get("status") == "not_running" for o in options)
         if not_running:
-            warnings.append("Some stops have no more scheduled buses today - service marked not_running")
+            warnings.append(f"Some stops have no bus scheduled in the next "
+                            f"{DEP_WINDOW_MIN // 60} h - service marked not_running")
+        long_wait = [o.get("waitMin") or 0 for o in options if o.get("longWait")]
+        if long_wait:
+            warnings.append(f"Longest wait at a stop: {max(long_wait)} min - "
+                            f"check the departure times")
         return warnings
 
     # ------------------------------------------------------ stop resolution

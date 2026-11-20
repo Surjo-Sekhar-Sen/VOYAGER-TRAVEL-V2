@@ -96,12 +96,29 @@ def _to_place(d: dict) -> Place:
     return Place(**{k: v for k, v in d.items() if k in Place.model_fields})
 
 
+def _serp_type(d: dict) -> tuple[str | None, list[str]]:
+    """SerpAPI `type` is a str for a single place and a LIST for a business.
+
+    `Place.primary_type` is a str, so passing the list straight through raised a
+    pydantic ValidationError and the whole search came back empty.
+    """
+    raw = d.get("type")
+    if isinstance(raw, list):
+        types = [str(t) for t in raw if str(t).strip()]
+        return (types[0] if types else None), types
+    if isinstance(raw, str) and raw.strip():
+        return raw.strip(), [raw.strip()]
+    return None, []
+
+
 def _serp_to_place(d: dict, query: str) -> Place | None:
     """SerpAPI google_maps search hit -> Place. None when it has no place_id/coords."""
     pid = d.get("place_id")
     lat, lng = d.get("lat"), d.get("lng")
     if not pid or lat is None or lng is None:
         return None
+    thumb = d.get("thumbnail")
+    primary_type, types = _serp_type(d)
     return Place(
         place_id=str(pid),
         name=d.get("title") or query,
@@ -110,7 +127,11 @@ def _serp_to_place(d: dict, query: str) -> Place | None:
         lng=float(lng),
         rating=d.get("rating"),
         user_rating_count=d.get("reviews") if isinstance(d.get("reviews"), int) else None,
-        primary_type=d.get("type"),
+        business_status=d.get("status") if isinstance(d.get("status"), str) else None,
+        primary_type=primary_type,
+        types=types,
+        # real Google image URL for the result ('' / None means none returned)
+        photo_name=thumb if isinstance(thumb, str) and thumb.startswith("http") else None,
         query=query,
     )
 

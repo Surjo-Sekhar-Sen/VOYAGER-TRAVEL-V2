@@ -192,3 +192,36 @@ html.dark .results-window {
   .bottom-nav .tab { padding: 10px 16px; }
   .bottom-nav .tab-label { display: none; }
 }
+
+/* Trip mode gets a tall, dedicated itinerary column on the right. */
+.results-window.trip-results-window {
+  left: auto;
+  right: 20px;
+  top: 20px;
+  bottom: 94px;
+  width: 430px;
+  max-height: none;
+  padding: 14px;
+}
+@media (max-width: 1100px) {
+  .results-window.trip-results-window { width: 390px; }
+}
+@media (max-width: 768px) {
+  .results-window.trip-results-window {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: 74px;
+    width: auto;
+    max-height: 62%;
+  }
+}
+
+@media (max-width: 768px) {
+  .input-window.trip-input-window { max-height: 24%; padding: 14px; }
+  .results-window.trip-results-window {
+    top: 46%;
+    bottom: 74px;
+    max-height: none;
+  }
+}

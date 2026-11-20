@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, MotionConfig, animate, motion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { useApp, scoreClass } from "../context/AppContext";
 import { api } from "../services/api";
 import type { PlaceResult } from "../types";
@@ -44,11 +44,19 @@ function highlight(text: string, query: string): ReactNode {
 }
 
 // rating counts up over ~400ms once the card enters (transform/opacity-free, no layout)
+const COUNT_UP_MS = 400;
 function CountUp({ value, delay = 0.28 }: { value: number; delay?: number }) {
   const [n, setN] = useState(0);
   useEffect(() => {
-    const controls = animate(0, value, { duration: 0.4, delay, ease: EASE as unknown as number[], onUpdate: (v) => setN(v) });
-    return () => controls.stop();
+    let raf = 0;
+    const start = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, Math.max(0, (t - start - delay * 1000) / COUNT_UP_MS));
+      setN(value * p);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [value, delay]);
   return <>{n.toFixed(1)}</>;
 }
@@ -203,7 +211,13 @@ export function SearchResults() {
 // ---------------------------------------------------------------- input window
 export default function SearchInput() {
   const { userLoc, setPlaces, setSearchResults, setNearbyBase, pinned, setPinned, clearTransient,
-    setSearching, setSearched, radiusKm, setRadiusKm } = useApp();
+    setSearching, setSearched, radiusKm, setRadiusKm, searchAnchor, setSearchAnchor,
+    setSelected, setShowDiscovery } = useApp();
+  /** default map centre when nothing else is known */
+  const CITY_FALLBACK = { lat: 12.9716, lng: 77.5946 };
+  /** the point Nearby searches around, in priority order:
+   *  a pinned/clicked result -> the place the last search was about -> GPS -> city */
+  const nearbyCenter = pinned ?? searchAnchor ?? userLoc ?? CITY_FALLBACK;
   const [tab, setTab] = useState<"specific" | "nearby">("specific");
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<PlaceResult[]>([]);
@@ -249,9 +263,17 @@ export default function SearchInput() {
 
   const switchTab = useCallback((t: "specific" | "nearby") => {
     if (t === tab) return;
-    clearTransient();
+    // Do NOT clearTransient() here: it wipes the results AND the searched place,
+    // so "search a place -> tap Nearby" used to lose the location and silently
+    // fall back to GPS. Only the visible result set is reset.
+    setPlaces([]);
+    setSearchResults([]);
+    setSearched(false);
+    setSelected(null);
+    setShowDiscovery(false);
+    setNearbyBase(null);
     setTab(t);
-  }, [tab, clearTransient]);
+  }, [tab, setPlaces, setSearchResults, setSearched, setSelected, setShowDiscovery, setNearbyBase]);
 
   const runSearch = async (q: string) => {
     if (!q.trim()) return;
@@ -265,6 +287,11 @@ export default function SearchInput() {
       const r = await api.searchPlaces(q, userLoc?.lat, userLoc?.lng);
       setSearchResults(r);
       setPlaces(r);
+      // remember WHERE this search was about, so Nearby can use it
+      const first = r[0];
+      setSearchAnchor(first
+        ? { name: first.name, lat: first.lat, lng: first.lng }
+        : null);
     } finally {
       setLoading(false);
       setSearching(false);
@@ -274,14 +301,23 @@ export default function SearchInput() {
   const clearQuery = () => {
     setQuery("");
     setSuggestions([]);
+    setSearchAnchor(null);
     clearTransient();
+  };
+
+  /** explicitly re-base Nearby on the device's own position */
+  const useCurrentLocation = () => {
+    if (!userLoc) return;
+    setPinned(null);
+    setSearchAnchor(null);
+    setNearbyBase({ lat: userLoc.lat, lng: userLoc.lng, radiusM: radiusKm * 1000 });
   };
 
   const runNearby = async () => {
     if (cats.size === 0) return;
     interactedRef.current = true;
     setIdlePulse(false);
-    const base = pinned ?? (userLoc ? { lat: userLoc.lat, lng: userLoc.lng } : { lat: 12.9716, lng: 77.5946 });
+    const base = nearbyCenter;
     setNearbyBase({ lat: base.lat, lng: base.lng, radiusM: radiusKm * 1000 });
     setCta("loading");
     setSearching(true);
@@ -313,7 +349,7 @@ export default function SearchInput() {
     return () => window.removeEventListener(RERUN_EVENT, onRerun);
   }, [tab, switchTab]);
 
-  const toggleCategory = (c: string, e: React.PointerEvent) => {
+  const toggleCategory = (c: string, e: React.MouseEvent<HTMLElement>) => {
     setCats((prev) => {
       const next = new Set(prev);
       if (next.has(c)) next.delete(c); else next.add(c);
@@ -339,7 +375,7 @@ export default function SearchInput() {
     if (rafRef.current != null) return;
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = null;
-      const base = pinned ?? (userLoc ? { lat: userLoc.lat, lng: userLoc.lng } : { lat: 12.9716, lng: 77.5946 });
+      const base = nearbyCenter;
       setNearbyBase({ lat: base.lat, lng: base.lng, radiusM: v * 1000 });
     });
   };
@@ -501,15 +537,38 @@ export default function SearchInput() {
               transition={{ duration: 0.22, ease: EASE }}
               layout
             >
-              {pinned && (
-                <div className="pinned-banner glass anim-in">
-                  <span className="row">
-                    <span className="material-symbols-outlined">push_pin</span>
-                    <span className="truncate">Near {pinned.name}</span>
-                  </span>
-                  <button className="btn ghost small" onClick={() => setPinned(null)}>Clear</button>
-                </div>
-              )}
+              {(() => {
+                const alreadyAtGps = !!userLoc && searchAnchor == null && pinned == null;
+                const label = pinned ? `Near ${pinned.name}`
+                  : searchAnchor ? `Near your search: ${searchAnchor.name}`
+                    : userLoc ? `Near your location (${userLoc.name ?? "GPS"})`
+                      : "Near Bengaluru centre";
+                return (
+                  <div className="pinned-banner glass anim-in">
+                    <span className="row">
+                      <span className="material-symbols-outlined">
+                        {pinned ? "push_pin" : searchAnchor ? "search" : "my_location"}
+                      </span>
+                      <span className="truncate">{label}</span>
+                    </span>
+                    <span className="row">
+                      <button
+                        className="btn ghost small"
+                        onClick={useCurrentLocation}
+                        disabled={alreadyAtGps || !userLoc}
+                        title="Search around my current location instead"
+                      >
+                        <span className="material-symbols-outlined">my_location</span> My location
+                      </button>
+                      <button
+                        className="btn ghost small"
+                        onClick={() => { setPinned(null); setSearchAnchor(null); setNearbyBase(null); }}
+                        title="Forget this base point"
+                      >Clear</button>
+                    </span>
+                  </div>
+                );
+              })()}
 
               <div className="chips-row" role="group" aria-label="Categories">
                 {NEARBY_CATEGORIES.map((c, i) => {

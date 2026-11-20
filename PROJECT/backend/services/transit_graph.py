@@ -25,6 +25,11 @@ WALK_BUS_BUS_M = 500
 WALK_BUS_METRO_M = 1000
 WALK_BUS_RAIL_M = 3000
 
+# Bump when the topology itself changes meaning (not just source data mtimes).
+# v2 (2026-10-15): the GTFS shape->stops index no longer repeats every stop once
+# per trip, so shape-derived bus edges are rebuilt from the clean sequence.
+GRAPH_CACHE_VERSION = 2
+
 # Radius for metro/rail node entry/exit reach (used by route_finder)
 EDGE_KEY = "edge"  # reserved, not used
 
@@ -119,7 +124,9 @@ class TransitAstarGraph:
             with open(path, "rb") as fh:
                 payload = pickle.load(fh)
             if payload.get("src_mtime") != self._source_mtime():
-                return False  # stale -> rebuild
+                return False  # source data changed -> rebuild
+            if payload.get("version") != GRAPH_CACHE_VERSION:
+                return False  # topology semantics changed -> rebuild
             self.nodes = payload["nodes"]
             self.adj = payload["adj"]
             print(f"[graph] loaded topology from {path.name} in "
@@ -139,6 +146,7 @@ class TransitAstarGraph:
             path.parent.mkdir(parents=True, exist_ok=True)
             with open(path, "wb") as fh:
                 pickle.dump({"src_mtime": self._source_mtime(),
+                             "version": GRAPH_CACHE_VERSION,
                              "nodes": self.nodes, "adj": self.adj}, fh,
                             protocol=pickle.HIGHEST_PROTOCOL)
             print(f"[graph] saved topology -> {path.name}")

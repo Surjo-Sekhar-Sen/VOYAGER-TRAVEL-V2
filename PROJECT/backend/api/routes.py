@@ -89,6 +89,7 @@ class DriveRequest(BaseModel):
 class TripDiscoverRequest(BaseModel):
     destination: str = "bengaluru"
     interests: list[str] = Field(default_factory=list)
+    categories: list[str] = Field(default_factory=list)
     group_type: str = "friends"
     limit: int = Field(default=12, ge=3, le=40)
     budget: float | None = None
@@ -97,6 +98,7 @@ class TripDiscoverRequest(BaseModel):
 class TripPlanRequest(BaseModel):
     destination: str = "bengaluru"
     interests: list[str] = Field(default_factory=list)
+    categories: list[str] = Field(default_factory=list)
     group_type: str = "friends"
     days: int = Field(default=3, ge=1, le=30)
     pace: str = "balanced"
@@ -356,6 +358,7 @@ def trip_discover(req: TripDiscoverRequest):
         group_type=req.group_type,
         limit=req.limit,
         budget=req.budget,
+        categories=req.categories,
     )
 
 
@@ -369,4 +372,5 @@ def trip_plan(req: TripPlanRequest):
         days=req.days,
         pace=req.pace,
         budget=req.budget,
+        categories=req.categories,
     )

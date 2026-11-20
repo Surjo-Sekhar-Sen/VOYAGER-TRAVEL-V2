@@ -60,15 +60,20 @@ class VoyagerLangGraph:
             jobs["prices"] = lambda: self._pricing.run(origin, dest, group_size)
 
         results = {}
-        with self._pool as pool:
-            futures = {pool.submit(fn): key for key, fn in jobs.items()}
-            for fut in as_completed(futures):
-                key = futures[fut]
-                try:
-                    results[key] = fut.result()
-                except Exception as exc:  # noqa: BLE001
-                    logger.warning("[langgraph] %s gather failed: %s", key, exc)
-                    results[key] = None
+        # NOTE: never wrap this in `with self._pool as pool:` — ThreadPoolExecutor's
+        # context manager shuts the pool down on exit. `self._pool` is a long-lived
+        # singleton (the agent is built once in app_state), so the first request used
+        # to kill the pool and every later request raised
+        # `RuntimeError: cannot schedule new futures after shutdown` -> HTTP 500 on
+        # /langgraph/route-context and /langgraph/ask. Submit directly, no shutdown.
+        futures = {self._pool.submit(fn): key for key, fn in jobs.items()}
+        for fut in as_completed(futures):
+            key = futures[fut]
+            try:
+                results[key] = fut.result()
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("[langgraph] %s gather failed: %s", key, exc)
+                results[key] = None
 
         state.weather = results.get("weather")
         state.traffic = results.get("traffic")

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../context/AppContext";
 import { api } from "../services/api";
 import type { HopOption, LatLng, Segment, SegmentResponse } from "../types";
@@ -69,10 +69,11 @@ export default function SegmentFlowView({ groupSize, budget }: { groupSize?: num
     }
   };
 
-  useMemo(() => {
-    if (!journey.segments?.segments?.length) loadInitial();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // fetch segment 1 once when the panel opens with no journey yet. This was a
+  // useMemo side effect, which React may re-run/skip freely (StrictMode double-
+  // invoked it, firing two segment requests on every open).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!journey.segments?.segments?.length) loadInitial(); }, []);
 
   const selectHop = async (idx: number, opt: HopOption) => {
     const nextConfirmed = [...confirmed.slice(0, idx), opt];
@@ -134,13 +135,21 @@ export default function SegmentFlowView({ groupSize, budget }: { groupSize?: num
   const breadcrumb = useMemo(() => {
     const items: { label: string; mode?: string }[] = [];
     if (source) items.push({ label: source.name || "Source" });
-    confirmed.forEach((c, i) => {
-      // BUG2: surface the access-walk to the boarding stop before the first
-      // transit hop (display-only; consistent with HopTreeView).
-      if (i === 0 && c.mode !== "walk" && c.accessWalk && (c.accessWalk.distanceKm ?? 0) >= 0.05) {
-        items.push({ label: `Walk to ${c.accessWalk.stopName}`, mode: "walk" });
+    confirmed.forEach((c) => {
+      // surface the walk onto EVERY transit leg — including the transfer walk
+      // between two buses — so the journey reads bus → walk → bus → walk, the way
+      // it is actually travelled (display-only; consistent with HopTreeView).
+      if (c.mode !== "walk" && c.accessWalk && (c.accessWalk.distanceKm ?? 0) >= 0.05) {
+        items.push({
+          label: `${c.accessWalk.isTransferWalk ? "Transfer walk" : "Walk"} to ${c.accessWalk.stopName}`,
+          mode: "walk",
+        });
       }
-      items.push({ label: `${c.routeNumber ?? ""} ${c.mode ?? ""}`.trim(), mode: c.mode });
+      items.push({
+        label: `${c.routeNumber ?? ""} ${c.mode ?? ""}`.trim() +
+          (c.waitMin != null && c.mode !== "walk" ? ` (${c.waitMin}m wait)` : ""),
+        mode: c.mode,
+      });
       items.push({ label: c.destinationStop?.name ?? "…" });
     });
     if (dest && !complete) items.push({ label: dest.name || "Destination", mode: "walk" });
@@ -148,9 +157,15 @@ export default function SegmentFlowView({ groupSize, budget }: { groupSize?: num
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source, dest, confirmed, complete]);
 
+  // total time = every ride + every access/transfer walk (both were being
+  // under-counted: only the first leg's walk was added)
   const totalTime = useMemo(() =>
-    confirmed.reduce((a, c, i) => a + (c.durationMin ?? 0) +
-      (i === 0 && c.mode !== "walk" ? (c.accessWalk?.durationMin ?? 0) : 0), 0), [confirmed]);
+    confirmed.reduce((a, c) => a + (c.durationMin ?? 0) +
+      (c.mode !== "walk" ? (c.accessWalk?.durationMin ?? 0) : 0), 0), [confirmed]);
+  const totalWait = useMemo(() =>
+    confirmed.reduce((a, c) => a + (c.waitMin ?? 0), 0), [confirmed]);
+  const walkKm = useMemo(() =>
+    confirmed.reduce((a, c) => a + (c.mode === "walk" ? (c.distanceKm ?? 0) : (c.accessWalk?.distanceKm ?? 0)), 0), [confirmed]);
   const totalFare = useMemo(() => confirmed.reduce((a, c) => a + (c.fare ?? 0), 0), [confirmed]);
   const perPersonFare = useMemo(() => confirmed.reduce((a, c) => a + (c.perPersonFare ?? c.fare ?? 0), 0), [confirmed]);
   const groupFare = gs * perPersonFare;
@@ -184,6 +199,12 @@ export default function SegmentFlowView({ groupSize, budget }: { groupSize?: num
             <span className="stat muted small">cost unavailable</span>
           )}
           <span className="stat muted small"><b>{confirmed.length}</b> leg{confirmed.length > 1 ? "s" : ""}</span>
+          {totalWait > 0 && (
+            <span className="stat muted small"><b>{totalWait}</b> min waiting</span>
+          )}
+          {walkKm > 0.01 && (
+            <span className="stat muted small"><b>{walkKm.toFixed(2)}</b> km walking</span>
+          )}
           {perPersonFare > 0 && gs > 1 && (
             <span className="stat">×<b>{gs}</b> travellers</span>
           )}

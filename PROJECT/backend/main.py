@@ -1,6 +1,6 @@
-"""VOYAGER v2 FastAPI app (PROMPT_3 API layer).
+"""VOYAGER v2 FastAPI app.
 
-Wires the segment builder (PROMPT_3) as HTTP endpoints. The data layer
+Wires the segment builder as HTTP endpoints. The data layer
 (GTFS/DB/graphhopper) is built lazily so `uvicorn backend.main:app --reload`
 starts instantly and the first request pays the warm-up cost.
 """

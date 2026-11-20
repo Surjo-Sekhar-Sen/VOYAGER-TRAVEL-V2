@@ -109,7 +109,7 @@ class TestNoFabricationGoldenRule:
         assert res["disclaimer"]
         for p in res["places"]:
             assert p["data_is_estimated"] is True
-            assert p["data_source"] == "static"
+            assert p["data_source"] in ("curated", "google", "osm", "live")
 
 
 class TestRelaxationEdgeCase:
@@ -122,6 +122,74 @@ class TestRelaxationEdgeCase:
         # and every returned place still carries a valid rank
         for p in res["places"]:
             assert p["rank"] >= 1
+
+
+class TestBengaluruDataset:
+    def test_dataset_is_real_and_unique(self):
+        from backend.services import trip_places
+
+        places = trip_places.places_for_destination("bengaluru")
+        assert len(places) >= 40, "the imported Bengaluru pool should be broad"
+        ids = [p.id for p in places]
+        assert len(ids) == len(set(ids)), "place ids must be unique"
+        names = [p.name.strip().lower() for p in places]
+        assert len(names) == len(set(names)), "duplicate place names must not ship"
+        for p in places:
+            assert p.destination == "bengaluru"
+            assert 12.0 <= p.lat <= 14.0 and 76.5 <= p.lng <= 78.5
+            assert p.category in INTEREST_TAGS
+            if p.rating_known:
+                assert 0 < p.rating <= 5
+            else:
+                assert p.rating == 0
+            if p.entry_fee_known:
+                assert p.entry_fee >= 0
+
+    def test_dataset_covers_every_planning_category(self):
+        from backend.services import trip_places
+
+        cats = {p.category for p in trip_places.places_for_destination("bengaluru")}
+        assert {"nature", "heritage", "food", "museum", "shopping", "religious"} <= cats
+
+
+class TestCategoryFilter:
+    def test_selected_category_drives_the_pool(self, svc):  # noqa: F821
+        res = svc.discover_places("bengaluru", categories=["food"],
+                                  group_type="friends", limit=10)
+        cats = {p["category"] for p in res["places"]}
+        assert cats == {"food"}, cats
+        assert all("food" in p["tags"] for p in res["places"])
+
+    def test_plan_respects_selected_categories(self, svc):  # noqa: F821
+        plan = svc.generate_plan("bengaluru", categories=["heritage", "museum"],
+                                 group_type="couple", days=2, pace="balanced")
+        cats = {p["category"] for d in plan["days"] for p in d["places"]}
+        assert cats <= {"heritage", "museum"}, cats
+        assert plan["total_places"] > 0
+
+
+class TestDayScheduling:
+    def test_time_of_day_ordering(self, svc):  # noqa: F821
+        plan = svc.generate_plan("bengaluru", categories=[], group_type="friends",
+                                 days=3, pace="balanced")
+        order = {"early_morning": 0, "morning": 1, "afternoon": 2, "evening": 3, "night": 4}
+        for day in plan["days"]:
+            slots = [order[p["slot"]] for p in day["places"]]
+            assert slots == sorted(slots), f"day {day['day']} is not time-ordered"
+            for p in day["places"]:
+                assert p["suggested_start"] and p["suggested_end"]
+                if p["category"] == "food" and p["slot"] == "afternoon":
+                    assert p["suggested_start"] >= "12:30"
+
+    def test_no_cross_town_travel_explosion(self, svc):  # noqa: F821
+        plan = svc.generate_plan("bengaluru", categories=[], group_type="friends",
+                                 days=3, pace="balanced")
+        for day in plan["days"]:
+            assert day["total_distance_km"] <= 45, (
+                day["day"], day["total_distance_km"], [p["name"] for p in day["places"]]
+            )
+            for p in day["places"]:
+                assert p["travel_from_prev_km"] <= 25
 
 
 class TestGeneratePlan:
